@@ -18,32 +18,41 @@ struct ArrowView: View {
             let dirX = dx / length
             let dirY = dy / length
             
-            // Свойства наконечника стрелки
-            let headLength: CGFloat = 20
-            let headAngle: CGFloat = .pi / 4
+            // Ширина основания треугольника
+            let baseWidth: CGFloat = 40
             
-            // Рисуем линию
+            // Вычисляем точки треугольника
+            // Вершина треугольника - это конечная точка
+            let tip = end
+            
+            // Вычисляем направление, перпендикулярное вектору движения (поворот на 90 градусов)
+            let perpX = -dirY
+            let perpY = dirX
+            
+            // Две точки, формирующие основание треугольника
+            // Они расположены в начальной точке, смещены перпендикулярно на половину baseWidth
+            let base1 = CGPoint(
+                x: start.x + perpX * baseWidth / 2,
+                y: start.y + perpY * baseWidth / 2
+            )
+            
+            let base2 = CGPoint(
+                x: start.x - perpX * baseWidth / 2,
+                y: start.y - perpY * baseWidth / 2
+            )
+            
+            // Рисуем треугольник
             var path = Path()
-            path.move(to: start)
-            path.addLine(to: end)
+            path.move(to: base1)
+            path.addLine(to: tip)
+            path.addLine(to: base2)
+            path.closeSubpath()
             
-            // Рисуем наконечник стрелки
-            let headPt1 = CGPoint(
-                x: end.x - headLength * cos(atan2(dirY, dirX) + headAngle),
-                y: end.y - headLength * sin(atan2(dirY, dirX) + headAngle)
-            )
-            let headPt2 = CGPoint(
-                x: end.x - headLength * cos(atan2(dirY, dirX) - headAngle),
-                y: end.y - headLength * sin(atan2(dirY, dirX) - headAngle)
-            )
+            // Заливаем треугольник цветом
+            context.fill(path, with: .color(color))
             
-            path.move(to: end)
-            path.addLine(to: headPt1)
-            path.move(to: end)
-            path.addLine(to: headPt2)
-            
-            // Рисуем стрелку с цветом
-            context.stroke(path, with: .color(color), lineWidth: 4)
+            // Добавляем обводку для более четкого вида
+            context.stroke(path, with: .color(color.opacity(0.8)), lineWidth: 1.5)
         }
     }
 }

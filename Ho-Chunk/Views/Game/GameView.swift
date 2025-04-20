@@ -8,7 +8,7 @@ struct GameView: View {
     var body: some View {
         ZStack {
             // Фон
-            BgView(name: .desertBg)
+            BgView(name: .desertBg, isBlur: true)
             
             // Верхний индикатор прогресса
             VStack {
