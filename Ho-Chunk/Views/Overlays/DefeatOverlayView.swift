@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct DefeatOverlayView: View {
-    @ObservedObject var gameViewModel: GameViewModel
     @State private var showRetryButton: Bool = false
     @State private var showMenuButton: Bool = false
     
@@ -21,7 +20,7 @@ struct DefeatOverlayView: View {
                 
                 Button {
                     // Перезапускаем текущий уровень
-                    gameViewModel.retryAfterDefeat()
+
                 } label: {
                     ActionView(width: 300, height: 150, text: "try again", textSize: 32)
                 }
@@ -31,7 +30,7 @@ struct DefeatOverlayView: View {
                 
                 Button {
                     // Возвращаемся в меню
-                    gameViewModel.navigateToMenu()
+                    
                 } label: {
                     ActionView(width: 250, height: 120, text: "go to menu", textSize: 28)
                 }
@@ -54,5 +53,5 @@ struct DefeatOverlayView: View {
 }
 
 #Preview {
-    DefeatOverlayView(gameViewModel: GameViewModel())
+    DefeatOverlayView()
 }

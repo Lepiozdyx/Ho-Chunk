@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct VictoryOverlayView: View {
-    @ObservedObject var gameViewModel: GameViewModel
+    
     @State private var showCoinAnimation: Bool = false
     
     var body: some View {
@@ -26,7 +26,7 @@ struct VictoryOverlayView: View {
                 
                 Button {
                     // Обрабатываем победу и начинаем следующий уровень
-                    gameViewModel.continueAfterVictory()
+                    
                 } label: {
                     ActionView(width: 300, height: 150, text: "continue", textSize: 32)
                 }
@@ -34,7 +34,7 @@ struct VictoryOverlayView: View {
                 
                 Button {
                     // Обрабатываем победу и возвращаемся в меню
-                    gameViewModel.navigateToMenu()
+                    
                 } label: {
                     ActionView(width: 250, height: 120, text: "go to menu", textSize: 28)
                 }
@@ -60,5 +60,5 @@ struct VictoryOverlayView: View {
 }
 
 #Preview {
-    VictoryOverlayView(gameViewModel: GameViewModel())
+    VictoryOverlayView()
 }

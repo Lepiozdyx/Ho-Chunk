@@ -2,159 +2,139 @@ import SwiftUI
 import Combine
 
 class GameViewModel: ObservableObject {
-    // Опубликованные свойства для реактивного обновления UI
-    @Published var navigationState: NavigationState = .menu
-    @Published var playerProgress: PlayerProgress
+    @Published var regions: [Region] = []
+    @Published var armies: [Army] = []
+    @Published var dragInfo: (from: Region, to: CGPoint)? = nil
     
-    // Игровой движок
-    @Published var gameEngine: GameEngine
+    private var timer: AnyCancellable?
     
-    // Отслеживание подписок
-    private var cancellables = Set<AnyCancellable>()
-    
-    // Инициализатор
     init() {
-        // Загрузка прогресса игрока
-        self.playerProgress = PlayerProgress.load()
-        
-        // Инициализация игрового движка
-        self.gameEngine = GameEngine()
-        
-        // Проверка на ежедневный вход
-        checkDailyLogin()
-        
-        // Настройка подписок для мониторинга состояния игры
-        setupSubscriptions()
+        setupRegions()
+        startGameLoop()
     }
     
-    // Настройка подписок на изменения игрового состояния
-    private func setupSubscriptions() {
-        // Мониторинг условий победы/поражения через обертку gameStateWrapper
-        gameEngine.$gameStateWrapper
-            .receive(on: RunLoop.main)
-            .sink { [weak self] wrapper in
-                guard let self = self else { return }
-                let state = wrapper.state
-                
-                // Реагирование на победу
-                if state.isPlayerVictory {
-                    self.handlePlayerVictory()
-                }
-                
-                // Реагирование на поражение
-                if state.isPlayerDefeat {
-                    self.handlePlayerDefeat()
-                }
+    private func setupRegions() {
+        // Создаем три региона в ряд с разными формами
+        let screenWidth = UIScreen.main.bounds.width
+        let spacing: CGFloat = 200
+        let centerY: CGFloat = 200
+        
+        // CPU регион (левый) - используем vector3
+        let cpuRegion = Region(
+            shape: .vector3,
+            position: CGPoint(x: screenWidth/2 - spacing, y: centerY),
+            owner: .cpu,
+            initialTroops: 5
+        )
+        
+        // Нейтральный регион (средний) - используем vector2
+        let neutralRegion = Region(
+            shape: .vector2,
+            position: CGPoint(x: screenWidth/2, y: centerY),
+            owner: .neutral,
+            initialTroops: 5
+        )
+        
+        // Регион игрока (правый) - используем vector1
+        let playerRegion = Region(
+            shape: .vector1,
+            position: CGPoint(x: screenWidth/2 + spacing, y: centerY),
+            owner: .player,
+            initialTroops: 5
+        )
+        
+        regions = [cpuRegion, neutralRegion, playerRegion]
+    }
+    
+    private func startGameLoop() {
+        // Обрабатываем движения армий и бои
+        timer = Timer.publish(every: 0.05, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.processArmyMovements()
+                // CPU не совершает никаких ходов, только накапливает войска
             }
-            .store(in: &cancellables)
     }
     
-    // MARK: - Методы навигации
-    
-    func navigateToGame() {
-        startGame(level: playerProgress.currentLevel)
-        navigationState = .game
-    }
-    
-    func navigateToMenu() {
-        stopGame()
-        navigationState = .menu
-    }
-    
-    func navigateToPause() {
-        pauseGame()
-        navigationState = .pause
-    }
-    
-    func navigateToSettings() {
-        navigationState = .settings
-    }
-    
-    func navigateToShop() {
-        navigationState = .shop
-    }
-    
-    func navigateToAchievements() {
-        navigationState = .achievements
-    }
-    
-    func navigateToTutorial() {
-        startGame(level: 1) // Обучающий уровень
-        navigationState = .tutorial
-    }
-    
-    func resumeGame() {
-        gameEngine.resumeGame()
-        navigationState = .game
-    }
-    
-    // MARK: - Методы управления игрой
-    
-    func startGame(level: Int) {
-        print("Starting game at level \(level)")
-        gameEngine.startGame(level: level)
-    }
-    
-    func pauseGame() {
-        gameEngine.pauseGame()
-    }
-    
-    func stopGame() {
-        gameEngine.stopGame()
-    }
-    
-    func handlePlayerVictory() {
-        print("Handling player victory")
+    private func processArmyMovements() {
+        let currentTime = Date()
+        var arrivedArmies: [Army] = []
         
-        // Переходим в состояние паузы чтобы показать оверлей победы
-        pauseGame()
-        
-        // Проверяем, было ли это состояние меньшинства
-        let wasInMinority = gameEngine.gameState.playerControlPercentage < 0.5
-        
-        // Обновляем прогресс игрока
-        playerProgress.registerGameWin(wasInMinority: wasInMinority)
-        
-        // Начисление монет за победу
-        playerProgress.addCoinsForVictory()
-        
-        // Разблокировка следующего уровня
-        if playerProgress.currentLevel == gameEngine.gameState.gameLevel {
-            playerProgress.currentLevel += 1
+        // Проверяем прибывшие армии
+        for army in armies {
+            if army.hasArrived(at: currentTime) {
+                arrivedArmies.append(army)
+                print("Армия \(army.owner) прибыла с \(army.count) войсками")
+                processCombat(army: army)
+            }
         }
         
-        // Сохранение прогресса
-        playerProgress.save()
+        // Удаляем прибывшие армии
+        if !arrivedArmies.isEmpty {
+            armies.removeAll { army in
+                arrivedArmies.contains { $0.id == army.id }
+            }
+        }
     }
     
-    func handlePlayerDefeat() {
-        print("Handling player defeat")
+    private func processCombat(army: Army) {
+        let targetRegion = army.toRegion
         
-        // Переходим в состояние паузы чтобы показать оверлей поражения
-        pauseGame()
+        if targetRegion.owner == army.owner {
+            // Подкрепление: просто добавляем войска
+            targetRegion.troopCount += army.count
+            print("Подкрепление: добавлено \(army.count) войск к региону \(targetRegion.owner)")
+        } else {
+            // Бой: сравниваем количество войск
+            print("Битва: \(army.count) атакующих против \(targetRegion.troopCount) защитников")
+            
+            if army.count > targetRegion.troopCount {
+                // Атакующий побеждает
+                let remainingTroops = army.count - targetRegion.troopCount
+                
+                // Важно: сначала меняем владельца, потом устанавливаем количество войск
+                let previousOwner = targetRegion.owner
+                targetRegion.changeOwner(to: army.owner)
+                targetRegion.troopCount = remainingTroops
+                
+                print("Победа атакующего! Регион перешел от \(previousOwner) к \(army.owner)")
+            } else {
+                // Защитник побеждает
+                targetRegion.troopCount -= army.count
+                print("Победа защитника! Осталось \(targetRegion.troopCount) войск")
+            }
+        }
+    }
+    
+    func sendArmy(from: Region, to: Region, count: Int) {
+        // Не отправляем, если количество равно 0 или превышает доступные войска
+        if count <= 0 || count > from.troopCount {
+            print("Невозможно отправить \(count) войск из региона с \(from.troopCount) войсками")
+            return
+        }
         
-        // Дополнительная логика при поражении, если потребуется
+        // Уменьшаем количество войск в исходном регионе
+        from.troopCount -= count
+        print("Отправка \(count) войск от \(from.owner) к региону \(to.owner)")
+        
+        // Создаем и добавляем армию
+        let army = Army(
+            owner: from.owner,
+            count: count,
+            fromRegion: from,
+            toRegion: to,
+            startTime: Date()
+        )
+        
+        armies.append(army)
     }
     
-    func continueAfterVictory() {
-        // Начинаем следующий уровень
-        startGame(level: playerProgress.currentLevel)
-        navigationState = .game
-    }
-    
-    func retryAfterDefeat() {
-        // Перезапускаем текущий уровень
-        startGame(level: gameEngine.gameState.gameLevel)
-        navigationState = .game
-    }
-    
-    private func checkDailyLogin() {
-        playerProgress.addCoinsForDailyLogin()
-    }
-    
-    // Метод для форсирования обновления UI
-    func forceUIUpdate() {
-        // Явно вызываем обновление UI для GameViewModel
-        objectWillChange.send()
+    // Вычисляем процент контроля игрока для индикатора прогресса
+    func calculatePlayerControlPercentage() -> Double {
+        let totalRegions = regions.count
+        guard totalRegions > 0 else { return 0.5 }
+        
+        let playerRegions = regions.filter { $0.owner == .player }.count
+        return Double(playerRegions) / Double(totalRegions)
     }
 }

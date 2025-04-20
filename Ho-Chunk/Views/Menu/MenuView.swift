@@ -2,7 +2,6 @@
 import SwiftUI
 
 struct MenuView: View {
-    @ObservedObject var gameViewModel: GameViewModel
     
     var body: some View {
         ZStack {
@@ -15,7 +14,7 @@ struct MenuView: View {
                     Spacer()
                     
                     Button {
-                        gameViewModel.navigateToGame()
+                        
                     } label: {
                         ActionView(width: 320, height: 200, text: "start", textSize: 32, isQuill: true)
                     }
@@ -23,19 +22,19 @@ struct MenuView: View {
                 
                 HStack {
                     Button {
-                        gameViewModel.navigateToSettings()
+                        
                     } label: {
                         ActionView(width: 200, height: 100, text: "settings", textSize: 24)
                     }
                     
                     Button {
-                        gameViewModel.navigateToShop()
+                        
                     } label: {
                         ActionView(width: 200, height: 100, text: "shop", textSize: 24)
                     }
                     
                     Button {
-                        gameViewModel.navigateToAchievements()
+                        
                     } label: {
                         ActionView(width: 200, height: 100, text: "achi", textSize: 24)
                     }
@@ -47,5 +46,5 @@ struct MenuView: View {
 }
 
 #Preview {
-    MenuView(gameViewModel: GameViewModel())
+    MenuView()
 }

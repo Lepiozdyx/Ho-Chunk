@@ -1,0 +1,60 @@
+import SwiftUI
+import Combine
+
+class Region: Identifiable, ObservableObject {
+    let id = UUID()
+    let shape: ImageResource
+    let position: CGPoint
+    
+    @Published var owner: Player
+    @Published var troopCount: Int
+    
+    var timer: AnyCancellable?
+    
+    init(shape: ImageResource, position: CGPoint, owner: Player, initialTroops: Int = 0) {
+        self.shape = shape
+        self.position = position
+        self.owner = owner
+        self.troopCount = initialTroops
+        
+        // Начинаем генерировать войска, если регион принадлежит игроку или CPU
+        if owner != .neutral {
+            startTroopGeneration()
+        }
+    }
+    
+    func startTroopGeneration() {
+        // Останавливаем существующий таймер, если есть
+        timer?.cancel()
+        
+        // Генерируем 1 отряд в секунду
+        if owner != .neutral {
+            timer = Timer.publish(every: 1.0, on: .main, in: .common)
+                .autoconnect()
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    self.troopCount += 1
+                    print("Регион \(self.owner): генерация войск, текущее количество: \(self.troopCount)")
+                }
+        }
+    }
+    
+    func stopTroopGeneration() {
+        timer?.cancel()
+        timer = nil
+    }
+    
+    func changeOwner(to newOwner: Player) {
+        // Останавливаем текущую генерацию
+        stopTroopGeneration()
+        
+        // Меняем владельца
+        owner = newOwner
+        print("Владелец региона изменился на \(newOwner)")
+        
+        // Запускаем или останавливаем генерацию войск в зависимости от нового владельца
+        if newOwner != .neutral {
+            startTroopGeneration()
+        }
+    }
+}

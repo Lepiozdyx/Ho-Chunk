@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct PauseView: View {
-    @ObservedObject var gameViewModel: GameViewModel
+
     
     var body: some View {
         ZStack {
@@ -14,13 +14,13 @@ struct PauseView: View {
                     .customFont(40)
                 
                 Button {
-                    gameViewModel.resumeGame()
+                    
                 } label: {
                     ActionView(width: 250, height: 120, text: "resume", textSize: 28)
                 }
                 
                 Button {
-                    gameViewModel.navigateToMenu()
+                    
                 } label: {
                     ActionView(width: 250, height: 120, text: "go to menu", textSize: 28)
                 }
@@ -30,5 +30,5 @@ struct PauseView: View {
 }
 
 #Preview {
-    PauseView(gameViewModel: GameViewModel())
+    PauseView()
 }
