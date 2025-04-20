@@ -1,9 +1,4 @@
-//
-//  Ho_ChunkApp.swift
-//  Ho-Chunk
-//
-//  Created by Alex on 18.04.2025.
-//
+
 
 import SwiftUI
 
@@ -12,6 +7,7 @@ struct Ho_ChunkApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.light)
         }
     }
 }
