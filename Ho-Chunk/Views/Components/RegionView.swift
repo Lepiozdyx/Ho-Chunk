@@ -1,23 +1,23 @@
 import SwiftUI
 
 struct RegionView: View {
-    let region: Region
+    @ObservedObject var region: Region
     
     var body: some View {
         Image(region.shape)
             .resizable()
             .scaledToFit()
             .colorMultiply(region.owner.color)
-            .frame(width: 180, height: 180) // Увеличиваем размер в 1.5 раза (было 120)
+            .frame(width: 180, height: 180)
             .shadow(color: .black, radius: 2)
             .overlay {
                 VStack {
                     Image(region.owner.logo)
                         .resizable()
-                        .frame(width: 30, height: 30) // Увеличиваем размер иконки тоже
+                        .frame(width: 30, height: 30)
                     
                     Text("\(region.troopCount)")
-                        .customFont(20) // Увеличиваем размер текста
+                        .customFont(20)
                 }
             }
             .position(region.position)

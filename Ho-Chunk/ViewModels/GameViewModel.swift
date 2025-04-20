@@ -13,6 +13,12 @@ class GameViewModel: ObservableObject {
         startGameLoop()
     }
     
+    deinit {
+        // Очищаем ресурсы при уничтожении ViewModel
+        timer?.cancel()
+        regions.forEach { $0.stopTroopGeneration() }
+    }
+    
     private func setupRegions() {
         // Создаем три региона в ряд с разными формами
         let screenWidth = UIScreen.main.bounds.width
@@ -32,7 +38,7 @@ class GameViewModel: ObservableObject {
             shape: .vector2,
             position: CGPoint(x: screenWidth/2, y: centerY),
             owner: .neutral,
-            initialTroops: 5
+            initialTroops: 0  // 0 войск в нейтральных регионах
         )
         
         // Регион игрока (правый) - используем vector1
@@ -52,7 +58,6 @@ class GameViewModel: ObservableObject {
             .autoconnect()
             .sink { [weak self] _ in
                 self?.processArmyMovements()
-                // CPU не совершает никаких ходов, только накапливает войска
             }
     }
     
@@ -71,8 +76,10 @@ class GameViewModel: ObservableObject {
         
         // Удаляем прибывшие армии
         if !arrivedArmies.isEmpty {
-            armies.removeAll { army in
-                arrivedArmies.contains { $0.id == army.id }
+            DispatchQueue.main.async {
+                self.armies.removeAll { army in
+                    arrivedArmies.contains { $0.id == army.id }
+                }
             }
         }
     }
@@ -94,13 +101,19 @@ class GameViewModel: ObservableObject {
                 
                 // Важно: сначала меняем владельца, потом устанавливаем количество войск
                 let previousOwner = targetRegion.owner
-                targetRegion.changeOwner(to: army.owner)
-                targetRegion.troopCount = remainingTroops
+                
+                // Используем DispatchQueue.main.async для обновления UI
+                DispatchQueue.main.async {
+                    targetRegion.changeOwner(to: army.owner)
+                    targetRegion.troopCount = remainingTroops
+                }
                 
                 print("Победа атакующего! Регион перешел от \(previousOwner) к \(army.owner)")
             } else {
                 // Защитник побеждает
-                targetRegion.troopCount -= army.count
+                DispatchQueue.main.async {
+                    targetRegion.troopCount -= army.count
+                }
                 print("Победа защитника! Осталось \(targetRegion.troopCount) войск")
             }
         }

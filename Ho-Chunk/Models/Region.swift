@@ -15,7 +15,8 @@ class Region: Identifiable, ObservableObject {
         self.shape = shape
         self.position = position
         self.owner = owner
-        self.troopCount = initialTroops
+        // Если регион нейтральный, устанавливаем 0 войск, иначе используем переданное значение
+        self.troopCount = owner == .neutral ? 0 : initialTroops
         
         // Начинаем генерировать войска, если регион принадлежит игроку или CPU
         if owner != .neutral {
@@ -23,11 +24,16 @@ class Region: Identifiable, ObservableObject {
         }
     }
     
+    // Добавляем метод для очистки ресурсов при уничтожении объекта
+    deinit {
+        stopTroopGeneration()
+    }
+    
     func startTroopGeneration() {
         // Останавливаем существующий таймер, если есть
-        timer?.cancel()
+        stopTroopGeneration()
         
-        // Генерируем 1 отряд в секунду
+        // Генерируем 1 отряд в секунду для не-нейтральных регионов
         if owner != .neutral {
             timer = Timer.publish(every: 1.0, on: .main, in: .common)
                 .autoconnect()

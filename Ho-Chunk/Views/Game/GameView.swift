@@ -68,6 +68,10 @@ struct GameView: View {
                 ArmyView(army: army)
             }
         }
+        .onDisappear {
+            // Останавливаем генерацию войск при скрытии представления
+            viewModel.regions.forEach { $0.stopTroopGeneration() }
+        }
     }
 }
 

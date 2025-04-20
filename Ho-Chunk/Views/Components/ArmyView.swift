@@ -3,25 +3,26 @@ import SwiftUI
 struct ArmyView: View {
     let army: Army
     
-    // Используем более надежный способ анимации через состояние
     @State private var progress: Double = 0
     
     var body: some View {
-        Text("\(army.count)")
-            .customFont(24)
-            .padding(10)
-            .background(
-                Circle()
-                    .fill(army.owner.color)
-                    .shadow(radius: 3)
-            )
-            .position(calculatePosition())
-            .onAppear {
-                // Запускаем анимацию сразу при появлении
-                withAnimation(.linear(duration: army.travelDuration)) {
-                    progress = 1.0
-                }
+        ZStack {
+            // Перемещаем весь ZStack как единое целое
+            Circle()
+                .fill(army.owner.color)
+                .frame(width: 50, height: 50)
+                .shadow(radius: 3)
+            
+            Text("\(army.count)")
+                .customFont(24)
+        }
+        .position(calculatePosition())
+        .onAppear {
+            // Запускаем анимацию сразу при появлении
+            withAnimation(.linear(duration: army.travelDuration)) {
+                progress = 1.0
             }
+        }
     }
     
     // Рассчитываем текущую позицию на основе прогресса анимации
@@ -31,26 +32,11 @@ struct ArmyView: View {
         let endX = army.toRegion.position.x
         let endY = army.toRegion.position.y
         
-        // Добавляем дугу для более естественного движения
-        let midX = (startX + endX) / 2
-        let midY = (startY + endY) / 2 - 40 // Смещаем вверх для создания дуги
-        
-        // Квадратичная интерполяция для создания кривой Безье
-        if progress <= 0.5 {
-            // Первая половина пути: от начала к средней точке
-            let t = progress * 2
-            return CGPoint(
-                x: (1-t) * (1-t) * startX + 2 * (1-t) * t * midX + t * t * endX,
-                y: (1-t) * (1-t) * startY + 2 * (1-t) * t * midY + t * t * endY
-            )
-        } else {
-            // Вторая половина пути: от средней точки к концу
-            let t = (progress - 0.5) * 2
-            return CGPoint(
-                x: (1-t) * (1-t) * midX + 2 * (1-t) * t * endX + t * t * endX,
-                y: (1-t) * (1-t) * midY + 2 * (1-t) * t * endY + t * t * endY
-            )
-        }
+        // Линейная интерполяция для упрощения
+        return CGPoint(
+            x: startX + (endX - startX) * CGFloat(progress),
+            y: startY + (endY - startY) * CGFloat(progress)
+        )
     }
 }
 
