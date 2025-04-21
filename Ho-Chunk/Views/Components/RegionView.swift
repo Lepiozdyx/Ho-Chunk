@@ -8,7 +8,7 @@ struct RegionView: View {
             .resizable()
             .scaledToFit()
             .colorMultiply(region.owner.color)
-            .frame(width: 180, height: 180)
+            .frame(width: region.width, height: region.height)
             .shadow(color: .black, radius: 2)
             .overlay {
                 VStack {
@@ -25,7 +25,13 @@ struct RegionView: View {
 }
 
 #Preview {
-    let region = Region(shape: .vector3, position: CGPoint(x: 250, y: 200), owner: .cpu)
+    let region = Region(
+        shape: .vector3,
+        position: CGPoint(x: 250, y: 200),
+        width: 200,
+        height: 200,
+        owner: .cpu
+    )
     
-    RegionView(region: region)
+    return RegionView(region: region)
 }

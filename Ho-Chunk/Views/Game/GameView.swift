@@ -1,6 +1,8 @@
+
 import SwiftUI
 
 struct GameView: View {
+    @EnvironmentObject private var appViewModel: AppViewModel
     @StateObject private var viewModel = GameViewModel()
     @State private var dragStartRegion: Region? = nil
     @State private var dragEndPoint: CGPoint? = nil
@@ -13,6 +15,25 @@ struct GameView: View {
             // Верхний индикатор прогресса
             VStack {
                 GameTopBarView(playerControlPercentage: viewModel.calculatePlayerControlPercentage())
+                
+                // Кнопка паузы
+                HStack {
+                    Spacer()
+                    
+                    Button {
+                        viewModel.togglePause(true)
+                        appViewModel.pauseGame()
+                    } label: {
+                        Image(systemName: "pause.circle.fill")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .foregroundColor(.white)
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Circle())
+                    }
+                    .padding()
+                }
+                
                 Spacer()
             }
             
@@ -68,13 +89,32 @@ struct GameView: View {
                 ArmyView(army: army)
             }
         }
+        .onAppear {
+            // При появлении инициализируем уровень
+            viewModel.setupLevel(appViewModel.gameLevel)
+            viewModel.togglePause(false)
+        }
         .onDisappear {
-            // Останавливаем генерацию войск при скрытии представления
-            viewModel.regions.forEach { $0.stopTroopGeneration() }
+            // При исчезновении останавливаем таймеры и очищаем ресурсы
+            viewModel.togglePause(true)
+            viewModel.cleanupResources()
+        }
+        .onChange(of: viewModel.isGameOver) { isOver in
+            if isOver {
+                // Обработка окончания игры
+                viewModel.togglePause(true)
+                
+                if viewModel.isVictory {
+                    appViewModel.showVictory()
+                } else {
+                    appViewModel.showDefeat()
+                }
+            }
         }
     }
 }
 
 #Preview {
     GameView()
+        .environmentObject(AppViewModel())
 }

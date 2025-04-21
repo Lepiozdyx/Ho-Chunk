@@ -1,10 +1,57 @@
+
 import SwiftUI
 
 struct ContentView: View {
-
+    @StateObject private var appViewModel = AppViewModel()
     
     var body: some View {
-        MenuView()
+        ZStack {
+            switch appViewModel.currentScreen {
+            case .menu:
+                MenuView()
+                    .environmentObject(appViewModel)
+                
+            case .game:
+                GameView()
+                    .environmentObject(appViewModel)
+                
+            case .pause:
+                GameView()
+                    .environmentObject(appViewModel)
+                    .overlay(
+                        PauseView()
+                            .environmentObject(appViewModel)
+                    )
+                
+            case .victory:
+                GameView()
+                    .environmentObject(appViewModel)
+                    .overlay(
+                        VictoryOverlayView()
+                            .environmentObject(appViewModel)
+                    )
+                
+            case .defeat:
+                GameView()
+                    .environmentObject(appViewModel)
+                    .overlay(
+                        DefeatOverlayView()
+                            .environmentObject(appViewModel)
+                    )
+                
+            case .settings:
+                Text("Settings") // Заглушка для настроек
+                    .environmentObject(appViewModel)
+                
+            case .shop:
+                Text("Shop") // Заглушка для магазина
+                    .environmentObject(appViewModel)
+                
+            case .achievements:
+                Text("Achievements") // Заглушка для достижений
+                    .environmentObject(appViewModel)
+            }
+        }
     }
 }
 

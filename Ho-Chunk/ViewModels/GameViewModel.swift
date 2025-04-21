@@ -5,60 +5,191 @@ class GameViewModel: ObservableObject {
     @Published var regions: [Region] = []
     @Published var armies: [Army] = []
     @Published var dragInfo: (from: Region, to: CGPoint)? = nil
+    @Published var currentLevel: Int = 1
     
-    private var timer: AnyCancellable?
+    // Для проверки условий победы/поражения
+    @Published var isGameOver: Bool = false
+    @Published var isVictory: Bool = false
     
-    init() {
-        setupRegions()
-        startGameLoop()
+    // AI настройки
+    private var aiTimer: AnyCancellable?
+    private var aiMoveInterval: TimeInterval = 2.0 // Интервал хода AI (в секундах)
+    
+    // Основной игровой таймер
+    private var gameTimer: AnyCancellable?
+    
+    // Флаг паузы
+    private var isPaused: Bool = false
+    
+    init(level: Int = 1) {
+        self.currentLevel = level
+        setupLevel(level)
     }
     
     deinit {
-        // Очищаем ресурсы при уничтожении ViewModel
-        timer?.cancel()
+        print("GameViewModel deinit - очищаем ресурсы")
+        cleanupResources()
+    }
+    
+    // Метод для очистки ресурсов
+    func cleanupResources() {
+        gameTimer?.cancel()
+        gameTimer = nil
+        
+        aiTimer?.cancel()
+        aiTimer = nil
+        
         regions.forEach { $0.stopTroopGeneration() }
     }
     
-    private func setupRegions() {
-        // Создаем три региона в ряд с разными формами
-        let screenWidth = UIScreen.main.bounds.width
-        let spacing: CGFloat = 200
-        let centerY: CGFloat = 200
+    // Настройка уровня
+    func setupLevel(_ levelId: Int) {
+        // Очищаем старые данные
+        cleanupResources()
+        regions = []
+        armies = []
+        isGameOver = false
+        isVictory = false
         
-        // CPU регион (левый) - используем vector3
-        let cpuRegion = Region(
-            shape: .vector3,
-            position: CGPoint(x: screenWidth/2 - spacing, y: centerY),
-            owner: .cpu,
-            initialTroops: 5
-        )
+        // Получаем определение уровня
+        let level = GameLevel.getLevel(levelId)
         
-        // Нейтральный регион (средний) - используем vector2
-        let neutralRegion = Region(
-            shape: .vector2,
-            position: CGPoint(x: screenWidth/2, y: centerY),
-            owner: .neutral,
-            initialTroops: 0  // 0 войск в нейтральных регионах
-        )
+        // Создаем регионы на основе определений
+        for regionDef in level.regions {
+            let region = Region(
+                shape: regionDef.shape,
+                position: regionDef.position,
+                width: regionDef.width,
+                height: regionDef.height,
+                owner: regionDef.owner,
+                initialTroops: regionDef.initialTroops
+            )
+            regions.append(region)
+        }
         
-        // Регион игрока (правый) - используем vector1
-        let playerRegion = Region(
-            shape: .vector1,
-            position: CGPoint(x: screenWidth/2 + spacing, y: centerY),
-            owner: .player,
-            initialTroops: 5
-        )
+        // Настраиваем сложность AI в зависимости от уровня
+        aiMoveInterval = max(3.0 - Double(levelId) * 0.5, 1.0) // Сложнее с ростом уровня
         
-        regions = [cpuRegion, neutralRegion, playerRegion]
+        // Запускаем игровой цикл и AI
+        startGameLoop()
+        startAI()
     }
     
+    // Запуск игрового цикла
     private func startGameLoop() {
-        // Обрабатываем движения армий и бои
-        timer = Timer.publish(every: 0.05, on: .main, in: .common)
+        gameTimer = Timer.publish(every: 0.05, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                self?.processArmyMovements()
+                guard let self = self, !self.isPaused else { return }
+                
+                self.processArmyMovements()
+                self.checkGameState()
             }
+    }
+    
+    // Запуск AI
+    private func startAI() {
+        aiTimer = Timer.publish(every: aiMoveInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self, !self.isPaused && !self.isGameOver else { return }
+                
+                self.performAIMove()
+            }
+    }
+    
+    // Пауза/возобновление игры
+    func togglePause(_ paused: Bool) {
+        isPaused = paused
+        
+        // Приостанавливаем/возобновляем генерацию войск
+        regions.forEach { region in
+            if paused {
+                region.stopTroopGeneration()
+            } else if region.owner != .neutral {
+                region.startTroopGeneration()
+            }
+        }
+    }
+    
+    // Проверка состояния игры (победа/поражение)
+    private func checkGameState() {
+        // Подсчет регионов
+        let playerRegions = regions.filter { $0.owner == .player }.count
+        let cpuRegions = regions.filter { $0.owner == .cpu }.count
+        let neutralRegions = regions.filter { $0.owner == .neutral }.count
+        
+        // Проверка условий победы/поражения
+        if playerRegions == 0 {
+            // Поражение - у игрока не осталось регионов
+            isGameOver = true
+            isVictory = false
+        } else if cpuRegions == 0 && neutralRegions == 0 {
+            // Победа - у игрока все регионы
+            isGameOver = true
+            isVictory = true
+        }
+    }
+    
+    // Логика ходов AI
+    private func performAIMove() {
+        // Получаем все регионы CPU
+        let cpuRegions = regions.filter { $0.owner == .cpu }
+        
+        // Если у CPU нет регионов, то ничего не делаем
+        if cpuRegions.isEmpty {
+            return
+        }
+        
+        // Получаем регионы игрока и нейтральные
+        let playerRegions = regions.filter { $0.owner == .player }
+        let neutralRegions = regions.filter { $0.owner == .neutral }
+        
+        // Для каждого региона CPU пытаемся сделать ход
+        for cpuRegion in cpuRegions {
+            // Если в регионе мало войск, пропускаем
+            if cpuRegion.troopCount < 5 {
+                continue
+            }
+            
+            // Сначала атакуем соседние нейтральные регионы
+            if !neutralRegions.isEmpty {
+                // Находим ближайший нейтральный регион
+                if let targetRegion = findClosestRegion(from: cpuRegion, targets: neutralRegions) {
+                    // Атакуем
+                    sendArmy(from: cpuRegion, to: targetRegion, count: cpuRegion.troopCount)
+                    break // Выходим после одного хода
+                }
+            }
+            
+            // Затем атакуем регионы игрока
+            if !playerRegions.isEmpty {
+                // Находим регион игрока с наименьшим количеством войск
+                if let weakestPlayerRegion = playerRegions.min(by: { $0.troopCount < $1.troopCount }) {
+                    // Атакуем только если наших войск достаточно
+                    if cpuRegion.troopCount > weakestPlayerRegion.troopCount + 2 {
+                        sendArmy(from: cpuRegion, to: weakestPlayerRegion, count: cpuRegion.troopCount)
+                        break // Выходим после одного хода
+                    }
+                }
+            }
+        }
+    }
+    
+    // Находим ближайший регион из списка целей
+    private func findClosestRegion(from source: Region, targets: [Region]) -> Region? {
+        return targets.min { a, b in
+            let distanceToA = distance(from: source.position, to: a.position)
+            let distanceToB = distance(from: source.position, to: b.position)
+            return distanceToA < distanceToB
+        }
+    }
+    
+    // Расчет расстояния между точками
+    private func distance(from a: CGPoint, to b: CGPoint) -> CGFloat {
+        let dx = b.x - a.x
+        let dy = b.y - a.y
+        return sqrt(dx*dx + dy*dy)
     }
     
     private func processArmyMovements() {

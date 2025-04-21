@@ -5,15 +5,19 @@ class Region: Identifiable, ObservableObject {
     let id = UUID()
     let shape: ImageResource
     let position: CGPoint
+    let width: CGFloat
+    let height: CGFloat
     
     @Published var owner: Player
     @Published var troopCount: Int
     
     var timer: AnyCancellable?
     
-    init(shape: ImageResource, position: CGPoint, owner: Player, initialTroops: Int = 0) {
+    init(shape: ImageResource, position: CGPoint, width: CGFloat = 180, height: CGFloat = 180, owner: Player, initialTroops: Int = 0) {
         self.shape = shape
         self.position = position
+        self.width = width
+        self.height = height
         self.owner = owner
         // Если регион нейтральный, устанавливаем 0 войск, иначе используем переданное значение
         self.troopCount = owner == .neutral ? 0 : initialTroops
