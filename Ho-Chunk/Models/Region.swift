@@ -28,13 +28,12 @@ class Region: Identifiable, ObservableObject {
         }
     }
     
-    // Добавляем метод для очистки ресурсов при уничтожении объекта
+    // метод для очистки ресурсов при уничтожении объекта
     deinit {
         stopTroopGeneration()
     }
     
     func startTroopGeneration() {
-        // Останавливаем существующий таймер, если есть
         stopTroopGeneration()
         
         // Генерируем 1 отряд в секунду для не-нейтральных регионов
@@ -55,14 +54,11 @@ class Region: Identifiable, ObservableObject {
     }
     
     func changeOwner(to newOwner: Player) {
-        // Останавливаем текущую генерацию
         stopTroopGeneration()
         
-        // Меняем владельца
         owner = newOwner
         print("Владелец региона изменился на \(newOwner)")
         
-        // Запускаем или останавливаем генерацию войск в зависимости от нового владельца
         if newOwner != .neutral {
             startTroopGeneration()
         }

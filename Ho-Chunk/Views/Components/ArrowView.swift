@@ -22,7 +22,6 @@ struct ArrowView: View {
             let baseWidth: CGFloat = 40
             
             // Вычисляем точки треугольника
-            // Вершина треугольника - это конечная точка
             let tip = end
             
             // Вычисляем направление, перпендикулярное вектору движения (поворот на 90 градусов)
@@ -30,7 +29,6 @@ struct ArrowView: View {
             let perpY = dirX
             
             // Две точки, формирующие основание треугольника
-            // Они расположены в начальной точке, смещены перпендикулярно на половину baseWidth
             let base1 = CGPoint(
                 x: start.x + perpX * baseWidth / 2,
                 y: start.y + perpY * baseWidth / 2
@@ -41,18 +39,17 @@ struct ArrowView: View {
                 y: start.y - perpY * baseWidth / 2
             )
             
-            // Рисуем треугольник
+            // треугольник
             var path = Path()
             path.move(to: base1)
             path.addLine(to: tip)
             path.addLine(to: base2)
             path.closeSubpath()
             
-            // Заливаем треугольник цветом
             context.fill(path, with: .color(color))
             
             // Добавляем обводку для более четкого вида
-            context.stroke(path, with: .color(color.opacity(0.8)), lineWidth: 1.5)
+            context.stroke(path, with: .color(color.opacity(0.5)), lineWidth: 3)
         }
     }
 }

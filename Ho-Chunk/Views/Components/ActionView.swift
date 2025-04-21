@@ -37,5 +37,5 @@ struct ActionView: View {
 }
 
 #Preview {
-    ActionView(width: 250, height: 150, text: "start", textSize: 32)
+    ActionView(width: 250, height: 120, text: "start", textSize: 32)
 }

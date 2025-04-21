@@ -8,40 +8,49 @@ struct DefeatOverlayView: View {
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.8)
+            Color.black.opacity(0.7)
                 .ignoresSafeArea()
             
-            VStack(spacing: 30) {
-                Text("DEFEAT!")
-                    .customFont(60)
-                    .foregroundColor(.red)
-                    .shadow(color: .black, radius: 5)
+            HStack {
+                Image(.indian)
+                    .resizable()
+                    .scaledToFit()
+                    .offset(y: 16)
                 
                 Spacer()
-                    .frame(height: 40)
+            }
+            
+            VStack(spacing: 10) {
+                Image(.textUnderlay)
+                    .resizable()
+                    .frame(width: 300, height: 80)
+                    .overlay {
+                        Text("DEFEAT")
+                            .customFont(42)
+
+                    }
                 
                 Button {
-                    // Перезапускаем текущий уровень
                     appViewModel.startGame(level: appViewModel.gameLevel)
                 } label: {
-                    ActionView(width: 300, height: 150, text: "try again", textSize: 32)
+                    ActionView(width: 250, height: 150, text: "retry", textSize: 28)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
                 .opacity(showRetryButton ? 1 : 0)
                 .offset(y: showRetryButton ? 0 : 20)
                 
                 Button {
                     appViewModel.goToMenu()
                 } label: {
-                    ActionView(width: 250, height: 120, text: "go to menu", textSize: 28)
+                    ActionView(width: 250, height: 150, text: "menu", textSize: 28)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
                 .opacity(showMenuButton ? 1 : 0)
                 .offset(y: showMenuButton ? 0 : 20)
             }
+            .padding()
         }
         .onAppear {
-            // Анимированное появление кнопок
             withAnimation(.easeOut(duration: 0.4).delay(0.5)) {
                 showRetryButton = true
             }

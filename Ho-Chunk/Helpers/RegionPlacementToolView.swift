@@ -47,7 +47,6 @@ struct RegionPlacementToolView: View {
                 
                 Image(regionData[index].shape)
                     .resizable()
-                    .scaledToFit()
                     .frame(width: regionData[index].width, height: regionData[index].height)
                     .colorMultiply(regionData[index].owner.color)
                     .opacity(isSelected ? 0.8 : 0.6)

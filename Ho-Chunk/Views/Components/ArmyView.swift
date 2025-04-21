@@ -10,11 +10,11 @@ struct ArmyView: View {
             // Перемещаем весь ZStack как единое целое
             Circle()
                 .fill(army.owner.color)
-                .frame(width: 50, height: 50)
-                .shadow(radius: 3)
+                .frame(width: 30, height: 30)
+                .shadow(color: .black, radius: 2)
             
             Text("\(army.count)")
-                .customFont(24)
+                .customFont(16)
         }
         .position(calculatePosition())
         .onAppear {

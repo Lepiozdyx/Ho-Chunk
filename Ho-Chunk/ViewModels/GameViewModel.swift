@@ -7,18 +7,16 @@ class GameViewModel: ObservableObject {
     @Published var dragInfo: (from: Region, to: CGPoint)? = nil
     @Published var currentLevel: Int = 1
     
-    // Для проверки условий победы/поражения
     @Published var isGameOver: Bool = false
     @Published var isVictory: Bool = false
     
     // AI настройки
     private var aiTimer: AnyCancellable?
-    private var aiMoveInterval: TimeInterval = 2.0 // Интервал хода AI (в секундах)
+    private var aiMoveInterval: TimeInterval = 3.0 // Интервал хода AI (в секундах)
     
     // Основной игровой таймер
     private var gameTimer: AnyCancellable?
     
-    // Флаг паузы
     private var isPaused: Bool = false
     
     init(level: Int = 1) {
