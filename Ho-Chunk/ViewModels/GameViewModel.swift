@@ -14,6 +14,13 @@ class GameViewModel: ObservableObject {
     @Published var showVictoryOverlay: Bool = false
     @Published var showDefeatOverlay: Bool = false
     
+    // Добавляем новые свойства для обучения
+    @Published var isTutorialLevel: Bool = false
+    @Published var showTutorialTips: Bool = false
+    
+    // Добавляем ссылку на AppViewModel для уведомления о победе/поражении
+    weak var appViewModel: AppViewModel?
+    
     // AI настройки
     private var aiTimer: AnyCancellable?
     private var aiMoveInterval: TimeInterval = 3.0 // Интервал хода AI (в секундах)
@@ -27,7 +34,7 @@ class GameViewModel: ObservableObject {
     }
     
     deinit {
-        print("GameViewModel deinit - очищаем ресурсы")
+        print("GameViewModel deinit")
         cleanupResources()
     }
     
@@ -54,17 +61,27 @@ class GameViewModel: ObservableObject {
         showVictoryOverlay = false
         showDefeatOverlay = false
         
+        // Определяем, является ли этот уровень обучающим
+        isTutorialLevel = (levelId == 1)
+        showTutorialTips = isTutorialLevel
+        
         // Получаем определение уровня
         let level = GameLevel.getLevel(levelId)
         
         // Создаем регионы на основе определений
         for regionDef in level.regions {
+            // Для первого уровня заменяем CPU на нейтральные регионы
+            var owner = regionDef.owner
+            if isTutorialLevel && owner == .cpu {
+                owner = .neutral
+            }
+            
             let region = Region(
                 shape: regionDef.shape,
                 position: regionDef.position,
                 width: regionDef.width,
                 height: regionDef.height,
-                owner: regionDef.owner,
+                owner: owner,
                 initialTroops: regionDef.initialTroops
             )
             regions.append(region)
@@ -73,9 +90,11 @@ class GameViewModel: ObservableObject {
         // Настраиваем сложность AI в зависимости от уровня
         aiMoveInterval = max(3.0 - Double(levelId) * 0.5, 1.0) // Сложнее с ростом уровня
         
-        // Запускаем игровой цикл и AI
+        // Запускаем игровой цикл и AI (если не обучающий уровень)
         startGameLoop()
-        startAI()
+        if !isTutorialLevel {
+            startAI()
+        }
     }
     
     func resetOverlays() {
@@ -95,8 +114,15 @@ class GameViewModel: ObservableObject {
             }
     }
     
-    // Запуск AI
+    // Запуск AI (модифицировано)
     private func startAI() {
+        aiTimer?.cancel()
+        
+        // На обучающем уровне не запускаем AI
+        if isTutorialLevel {
+            return
+        }
+        
         aiTimer = Timer.publish(every: aiMoveInterval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
@@ -126,12 +152,22 @@ class GameViewModel: ObservableObject {
             isVictory = false
             showDefeatOverlay = true
             isPaused = true  // Останавливаем игровой процесс
+            
+            // Уведомляем AppViewModel о поражении
+            DispatchQueue.main.async {
+                self.appViewModel?.showDefeat()
+            }
         } else if cpuRegions == 0 && neutralRegions == 0 && !isGameOver {
             // Победа - у игрока все регионы
             isGameOver = true
             isVictory = true
             showVictoryOverlay = true
             isPaused = true  // Останавливаем игровой процесс
+            
+            // Уведомляем AppViewModel о победе
+            DispatchQueue.main.async {
+                self.appViewModel?.showVictory()
+            }
         }
     }
     

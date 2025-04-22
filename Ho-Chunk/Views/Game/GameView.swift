@@ -91,27 +91,39 @@ struct GameView: View {
                 ArmyView(army: army)
             }
             
+            // Обучающие подсказки (только если включены)
+            if viewModel.showTutorialTips {
+                TipsView(showTips: $viewModel.showTutorialTips)
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: viewModel.showTutorialTips)
+                    .zIndex(100) // Поверх всего остального
+            }
+            
             // Показываем оверлей паузы
             if viewModel.isPaused && !viewModel.showVictoryOverlay && !viewModel.showDefeatOverlay {
                 PauseView()
                     .environmentObject(appViewModel)
+                    .zIndex(90)
             }
             
             // Показываем оверлей победы
             if viewModel.showVictoryOverlay {
                 VictoryOverlayView()
                     .environmentObject(appViewModel)
+                    .zIndex(90)
             }
             
             // Показываем оверлей поражения
             if viewModel.showDefeatOverlay {
                 DefeatOverlayView()
                     .environmentObject(appViewModel)
+                    .zIndex(90)
             }
         }
         .onAppear {
-            // Сохраняем ссылку на viewModel в appViewModel
+            // Сохраняем ссылку на viewModel в appViewModel и устанавливаем связь с AppViewModel
             appViewModel.gameViewModel = viewModel
+            viewModel.appViewModel = appViewModel // Добавляем эту строку, чтобы установить связь
             
             // При появлении инициализируем уровень
             viewModel.setupLevel(appViewModel.gameLevel)

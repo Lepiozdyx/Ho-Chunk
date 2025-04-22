@@ -27,6 +27,10 @@ struct ContentView: View {
                     .environmentObject(appViewModel)
             }
         }
+        .onAppear {
+            // Проверяем ежедневный бонус при запуске
+            appViewModel.checkDailyBonus()
+        }
     }
 }
 

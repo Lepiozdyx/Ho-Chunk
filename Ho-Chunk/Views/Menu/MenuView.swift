@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 struct MenuView: View {
@@ -48,4 +47,5 @@ struct MenuView: View {
 
 #Preview {
     MenuView()
+        .environmentObject(AppViewModel())
 }
