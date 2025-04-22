@@ -14,27 +14,30 @@ struct GameView: View {
             // Верхний индикатор прогресса
             VStack {
                 GameTopBarView(playerControlPercentage: viewModel.calculatePlayerControlPercentage())
-                
-                // Кнопка паузы
-                HStack {
-                    Spacer()
-                    
-                    Button {
-                        // Устанавливаем флаг паузы в нашем viewModel
-                        viewModel.togglePause(true)
-                    } label: {
-                        Image(systemName: "pause.circle.fill")
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(.white)
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
-                    }
-                    .padding()
-                }
-                
                 Spacer()
             }
+            
+            // Кнопка паузы
+            VStack {
+                HStack {
+                    Button {
+                        viewModel.togglePause(true)
+                    } label: {
+                        Image(.buttonCircle)
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .overlay {
+                                Image(.menu)
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                            }
+                    }
+                    
+                    Spacer()
+                }
+                Spacer()
+            }
+            .padding([.top, .horizontal])
             
             // Регионы
             ForEach(viewModel.regions) { region in
