@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "coin_counter.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "coin_counter.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

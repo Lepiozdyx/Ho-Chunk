@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "fall_bg.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "button.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

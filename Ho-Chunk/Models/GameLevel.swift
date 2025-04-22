@@ -42,7 +42,7 @@ struct GameLevel {
             RegionDefinition(shape: .vector2, position: CGPoint(x: 208, y: 188), width: 140, height: 160, owner: .neutral, initialTroops: 0),
             RegionDefinition(shape: .vector3, position: CGPoint(x: 306, y: 265), width: 140, height: 150, owner: .neutral, initialTroops: 0),
             RegionDefinition(shape: .vector4, position: CGPoint(x: 274, y: 115), width: 130, height: 150, owner: .neutral, initialTroops: 0),
-            RegionDefinition(shape: .vector5, position: CGPoint(x: 429, y: 292), width: 160, height: 130, owner: .neutral, initialTroops: 0),
+            RegionDefinition(shape: .vector5, position: CGPoint(x: 429, y: 292), width: 155, height: 125, owner: .neutral, initialTroops: 0),
             RegionDefinition(shape: .vector6, position: CGPoint(x: 399, y: 217), width: 125, height: 155, owner: .neutral, initialTroops: 0),
             RegionDefinition(shape: .vector7, position: CGPoint(x: 371, y: 101), width: 150, height: 140, owner: .neutral, initialTroops: 0)
         ]),
@@ -70,7 +70,6 @@ struct GameLevel {
             RegionDefinition(shape: .vector4, position: CGPoint(x: 458, y: 136), width: 140, height: 90, owner: .neutral, initialTroops: 0),
             RegionDefinition(shape: .vector8, position: CGPoint(x: 389, y: 304), width: 140, height: 110, owner: .neutral, initialTroops: 0),
             RegionDefinition(shape: .vector5, position: CGPoint(x: 266, y: 307), width: 160, height: 90, owner: .neutral, initialTroops: 0),
-//            RegionDefinition(shape: .vector6, position: CGPoint(x: 189, y: 291), width: 100, height: 80, owner: .neutral, initialTroops: 0),
         ]),
         GameLevel(id: 5, regions: [
             RegionDefinition(shape: .vector1, position: CGPoint(x: 175, y: 106), width: 160, height: 100, owner: .player, initialTroops: 0),

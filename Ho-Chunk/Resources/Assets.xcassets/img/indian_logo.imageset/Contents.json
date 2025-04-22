@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "indian_logo.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "indian_logo.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
