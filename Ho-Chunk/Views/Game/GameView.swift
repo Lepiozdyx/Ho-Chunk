@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 struct GameView: View {
@@ -21,8 +20,8 @@ struct GameView: View {
                     Spacer()
                     
                     Button {
+                        // Устанавливаем флаг паузы в нашем viewModel
                         viewModel.togglePause(true)
-                        appViewModel.pauseGame()
                     } label: {
                         Image(systemName: "pause.circle.fill")
                             .resizable()
@@ -88,28 +87,35 @@ struct GameView: View {
             ForEach(viewModel.armies) { army in
                 ArmyView(army: army)
             }
+            
+            // Показываем оверлей паузы
+            if viewModel.isPaused && !viewModel.showVictoryOverlay && !viewModel.showDefeatOverlay {
+                PauseView()
+                    .environmentObject(appViewModel)
+            }
+            
+            // Показываем оверлей победы
+            if viewModel.showVictoryOverlay {
+                VictoryOverlayView()
+                    .environmentObject(appViewModel)
+            }
+            
+            // Показываем оверлей поражения
+            if viewModel.showDefeatOverlay {
+                DefeatOverlayView()
+                    .environmentObject(appViewModel)
+            }
         }
         .onAppear {
+            // Сохраняем ссылку на viewModel в appViewModel
+            appViewModel.gameViewModel = viewModel
+            
             // При появлении инициализируем уровень
             viewModel.setupLevel(appViewModel.gameLevel)
-            viewModel.togglePause(false)
         }
         .onDisappear {
             // При исчезновении останавливаем таймеры и очищаем ресурсы
-            viewModel.togglePause(true)
             viewModel.cleanupResources()
-        }
-        .onChange(of: viewModel.isGameOver) { isOver in
-            if isOver {
-                // Обработка окончания игры
-                viewModel.togglePause(true)
-                
-                if viewModel.isVictory {
-                    appViewModel.showVictory()
-                } else {
-                    appViewModel.showDefeat()
-                }
-            }
         }
     }
 }

@@ -14,30 +14,6 @@ struct ContentView: View {
                 GameView()
                     .environmentObject(appViewModel)
                 
-            case .pause:
-                GameView()
-                    .environmentObject(appViewModel)
-                    .overlay(
-                        PauseView()
-                            .environmentObject(appViewModel)
-                    )
-                
-            case .victory:
-                GameView()
-                    .environmentObject(appViewModel)
-                    .overlay(
-                        VictoryOverlayView()
-                            .environmentObject(appViewModel)
-                    )
-                
-            case .defeat:
-                GameView()
-                    .environmentObject(appViewModel)
-                    .overlay(
-                        DefeatOverlayView()
-                            .environmentObject(appViewModel)
-                    )
-                
             case .settings:
                 Text("Settings") // Заглушка для настроек
                     .environmentObject(appViewModel)

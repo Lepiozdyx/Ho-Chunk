@@ -1,4 +1,3 @@
-
 import SwiftUI
 import Combine
 
@@ -6,6 +5,8 @@ class AppViewModel: ObservableObject {
     @Published var currentScreen: AppScreen = .menu
     @Published var gameLevel: Int = 1
     @Published var coins: Int = 0
+    
+    @Published var gameViewModel: GameViewModel?
     
     // Инициализация
     init() {
@@ -20,34 +21,55 @@ class AppViewModel: ObservableObject {
     // Запуск игры с указанным уровнем
     func startGame(level: Int = 1) {
         gameLevel = level
+        gameViewModel = GameViewModel(level: level)
         navigateTo(.game)
     }
     
     // Возврат в меню
     func goToMenu() {
+        gameViewModel?.cleanupResources()
+        gameViewModel = nil
         navigateTo(.menu)
     }
     
-    // Показать паузу
+    // Показать паузу - теперь просто устанавливает флаг в GameViewModel
     func pauseGame() {
-        navigateTo(.pause)
+        gameViewModel?.togglePause(true)
     }
     
-    // Продолжить после паузы
+    // Продолжить после паузы - снимает флаг
     func resumeGame() {
-        navigateTo(.game)
+        gameViewModel?.togglePause(false)
     }
     
     // Показать экран победы
     func showVictory() {
-        // Награда за победу
+        // Начисляем награду
         coins += 50
-        navigateTo(.victory)
+        
+        // Устанавливаем флаг оверлея победы
+        gameViewModel?.showVictoryOverlay = true
+        gameViewModel?.isPaused = true
     }
     
     // Показать экран поражения
     func showDefeat() {
-        navigateTo(.defeat)
+        // Устанавливаем флаг оверлея поражения
+        gameViewModel?.showDefeatOverlay = true
+        gameViewModel?.isPaused = true
+    }
+    
+    // Метод для перезапуска уровня
+    func restartLevel() {
+        gameViewModel?.resetOverlays()
+        gameViewModel?.setupLevel(gameLevel)
+    }
+    
+    // Метод для перехода к следующему уровню
+    func goToNextLevel() {
+        gameLevel += 1
+        gameViewModel?.resetOverlays()
+        gameViewModel?.setupLevel(gameLevel)
     }
     
     // Сохранение данных

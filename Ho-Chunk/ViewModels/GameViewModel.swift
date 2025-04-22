@@ -9,6 +9,10 @@ class GameViewModel: ObservableObject {
     
     @Published var isGameOver: Bool = false
     @Published var isVictory: Bool = false
+    @Published var isPaused: Bool = false
+    
+    @Published var showVictoryOverlay: Bool = false
+    @Published var showDefeatOverlay: Bool = false
     
     // AI настройки
     private var aiTimer: AnyCancellable?
@@ -16,8 +20,6 @@ class GameViewModel: ObservableObject {
     
     // Основной игровой таймер
     private var gameTimer: AnyCancellable?
-    
-    private var isPaused: Bool = false
     
     init(level: Int = 1) {
         self.currentLevel = level
@@ -48,6 +50,9 @@ class GameViewModel: ObservableObject {
         armies = []
         isGameOver = false
         isVictory = false
+        isPaused = false
+        showVictoryOverlay = false
+        showDefeatOverlay = false
         
         // Получаем определение уровня
         let level = GameLevel.getLevel(levelId)
@@ -71,6 +76,11 @@ class GameViewModel: ObservableObject {
         // Запускаем игровой цикл и AI
         startGameLoop()
         startAI()
+    }
+    
+    func resetOverlays() {
+        showVictoryOverlay = false
+        showDefeatOverlay = false
     }
     
     // Запуск игрового цикла
@@ -99,15 +109,7 @@ class GameViewModel: ObservableObject {
     // Пауза/возобновление игры
     func togglePause(_ paused: Bool) {
         isPaused = paused
-        
-        // Приостанавливаем/возобновляем генерацию войск
-        regions.forEach { region in
-            if paused {
-                region.stopTroopGeneration()
-            } else if region.owner != .neutral {
-                region.startTroopGeneration()
-            }
-        }
+        // Не останавливаем генерацию войск - игра продолжается на фоне
     }
     
     // Проверка состояния игры (победа/поражение)
@@ -118,14 +120,18 @@ class GameViewModel: ObservableObject {
         let neutralRegions = regions.filter { $0.owner == .neutral }.count
         
         // Проверка условий победы/поражения
-        if playerRegions == 0 {
+        if playerRegions == 0 && !isGameOver {
             // Поражение - у игрока не осталось регионов
             isGameOver = true
             isVictory = false
-        } else if cpuRegions == 0 && neutralRegions == 0 {
+            showDefeatOverlay = true
+            isPaused = true  // Останавливаем игровой процесс
+        } else if cpuRegions == 0 && neutralRegions == 0 && !isGameOver {
             // Победа - у игрока все регионы
             isGameOver = true
             isVictory = true
+            showVictoryOverlay = true
+            isPaused = true  // Останавливаем игровой процесс
         }
     }
     

@@ -43,7 +43,7 @@ struct VictoryOverlayView: View {
                 
                 Button {
                     // Начать следующий уровень
-                    appViewModel.startGame(level: appViewModel.gameLevel + 1)
+                    appViewModel.goToNextLevel()
                 } label: {
                     ActionView(width: 250, height: 150, text: "continue", textSize: 28)
                 }

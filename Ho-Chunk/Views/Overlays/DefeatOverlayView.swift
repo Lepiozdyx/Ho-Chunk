@@ -31,7 +31,7 @@ struct DefeatOverlayView: View {
                     }
                 
                 Button {
-                    appViewModel.startGame(level: appViewModel.gameLevel)
+                    appViewModel.restartLevel()
                 } label: {
                     ActionView(width: 250, height: 150, text: "retry", textSize: 28)
                 }
