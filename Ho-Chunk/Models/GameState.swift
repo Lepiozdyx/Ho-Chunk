@@ -7,6 +7,7 @@ struct GameState: Codable {
     var coins: Int = 0
     var lastLoginDate: Date?
     var completedAchievements: [String] = []
+    var notifiedAchievements: [String] = [] // ??
     var purchasedThemes: [String] = ["desert"]
     var currentThemeId: String = "desert"
     var tutorialCompleted: Bool = false

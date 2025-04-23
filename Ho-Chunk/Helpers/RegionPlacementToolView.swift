@@ -1,5 +1,6 @@
 import SwiftUI
 
+#warning("delete before publish")
 /// Инструмент для визуального размещения регионов на карте
 struct RegionPlacementToolView: View {
     // Массив для хранения данных о размещаемых регионах

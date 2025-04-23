@@ -13,37 +13,22 @@ struct AchiUnlockedView: View {
             Spacer()
             
             HStack {
-                Image(.frame)
+                Spacer()
+                
+                Image(achievement.imageResource)
                     .resizable()
-                    .frame(width: 200, height: 70)
-                    .overlay {
-                        HStack {
-                            Image(achievement.imageResource)
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .padding(.leading, 8)
-                            
-                            VStack(alignment: .leading) {
-                                Text("Unlocked!")
-                                    .customFont(12, color: .yellow)
-                                
-                                Text(achievement.name)
-                                    .customFont(16)
-                            }
-                        }
-                    }
+                    .frame(width: 35, height: 40)
             }
-            .offset(y: offset)
-            .opacity(opacity)
         }
-        .padding(.bottom)
+        .padding([.horizontal, .bottom], 8)
+        .offset(y: offset)
+        .opacity(opacity)
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                 offset = 0
                 opacity = 1
             }
             
-            // Автоматически скрываем через 3 секунды
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 withAnimation(.easeOut(duration: 0.5)) {
                     offset = 200
