@@ -62,6 +62,16 @@ class AppViewModel: ObservableObject {
             gameState.maxCompletedLevel = gameLevel
         }
         
+        // Обновляем счетчик выигранных игр для достижения "destroyer"
+        gameState.gamesWonCount += 1
+        
+        // Проверяем достижение "First Victory"
+        // Если это первая победа и достижение еще не получено, отмечаем его
+        if gameState.gamesWonCount == 1 &&
+           !gameState.completedAchievements.contains("firstVictory") {
+            print("Achievement 'First Victory' unlocked!")
+        }
+        
         // Начисляем награду
         coins += 50
         gameState.coins = coins

@@ -1,3 +1,4 @@
+
 import SwiftUI
 import Combine
 
@@ -255,6 +256,37 @@ class GameViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Achievement Tracking
+    
+    // Добавляем метод для отслеживания достижений при захвате территорий
+    private func updateAchievementsAfterCapture(from previousOwner: Player, to newOwner: Player) {
+        // Проверяем, что есть доступ к AppViewModel
+        guard let appViewModel = appViewModel else { return }
+        
+        // Обновляем только если игрок захватил регион
+        if newOwner == .player && previousOwner != .player {
+            // Загружаем текущее состояние игры
+            var gameState = GameState.load()
+            
+            // Увеличиваем счетчик захваченных регионов
+            gameState.regionsCaptureDcount += 1
+            
+            // Проверяем, является ли это первым захваченным регионом
+            // Если это первый захват и достижение "firstStep" еще не получено,
+            // то считаем его выполненным
+            if gameState.regionsCaptureDcount == 1 &&
+               !gameState.completedAchievements.contains("firstStep") {
+                print("Achievement 'First Step' unlocked!")
+            }
+            
+            // Сохраняем обновленное состояние
+            gameState.save()
+            
+            // Обновляем состояние в AppViewModel
+            appViewModel.gameState = gameState
+        }
+    }
+    
     private func processCombat(army: Army) {
         let targetRegion = army.toRegion
         
@@ -277,6 +309,11 @@ class GameViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     targetRegion.changeOwner(to: army.owner)
                     targetRegion.troopCount = remainingTroops
+                    
+                    // Обновляем достижения при захвате региона игроком
+                    if army.owner == .player {
+                        self.updateAchievementsAfterCapture(from: previousOwner, to: army.owner)
+                    }
                 }
                 
                 print("Победа атакующего! Регион перешел от \(previousOwner) к \(army.owner)")

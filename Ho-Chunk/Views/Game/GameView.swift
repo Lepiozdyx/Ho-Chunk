@@ -1,3 +1,4 @@
+
 import SwiftUI
 
 struct GameView: View {
@@ -5,6 +6,10 @@ struct GameView: View {
     @StateObject private var viewModel = GameViewModel()
     @State private var dragStartRegion: Region? = nil
     @State private var dragEndPoint: CGPoint? = nil
+    
+    // Состояние для отображения уведомлений о достижениях
+    @State private var showingAchievementNotification: Bool = false
+    @State private var unlockedAchievement: Achievement? = nil
     
     var body: some View {
         ZStack {
@@ -74,6 +79,9 @@ struct GameView: View {
                                             // Отправляем ВСЕ войска по ТЗ
                                             let troopsToSend = dragStartRegion.troopCount
                                             viewModel.sendArmy(from: dragStartRegion, to: targetRegion, count: troopsToSend)
+                                            
+                                            // Проверяем достижение First Step после отправки армии
+                                            checkFirstStepAchievement()
                                         }
                                     }
                                 }
@@ -115,6 +123,10 @@ struct GameView: View {
                 VictoryOverlayView()
                     .environmentObject(appViewModel)
                     .zIndex(90)
+                    .onAppear {
+                        // Проверяем достижение First Victory при победе
+                        checkFirstVictoryAchievement()
+                    }
             }
             
             // Показываем оверлей поражения
@@ -122,6 +134,12 @@ struct GameView: View {
                 DefeatOverlayView()
                     .environmentObject(appViewModel)
                     .zIndex(90)
+            }
+            
+            // Отображаем уведомление о разблокированном достижении
+            if showingAchievementNotification, let achievement = unlockedAchievement {
+                AchiUnlockedView(achievement: achievement, isShowing: $showingAchievementNotification)
+                    .zIndex(110) // Поверх всех остальных элементов
             }
         }
         .onAppear {
@@ -136,6 +154,42 @@ struct GameView: View {
             // При исчезновении останавливаем таймеры и очищаем ресурсы
             viewModel.cleanupResources()
         }
+    }
+    
+    // MARK: - Achievement Checking Methods
+    
+    // Проверяет достижение "First Step"
+    private func checkFirstStepAchievement() {
+        let gameState = GameState.load()
+        
+        // Проверяем выполнение достижения, но не было ли оно уже получено
+        if gameState.regionsCaptureDcount > 0 && !gameState.completedAchievements.contains("firstStep") {
+            // Находим соответствующее достижение
+            if let achievement = Achievement.allAchievements.first(where: { $0.id == "firstStep" }) {
+                // Показываем уведомление
+                showAchievementNotification(achievement)
+            }
+        }
+    }
+    
+    // Проверяет достижение "First Victory"
+    private func checkFirstVictoryAchievement() {
+        let gameState = GameState.load()
+        
+        // Проверяем выполнение достижения, но не было ли оно уже получено
+        if gameState.gamesWonCount > 0 && !gameState.completedAchievements.contains("firstVictory") {
+            // Находим соответствующее достижение
+            if let achievement = Achievement.allAchievements.first(where: { $0.id == "firstVictory" }) {
+                // Показываем уведомление
+                showAchievementNotification(achievement)
+            }
+        }
+    }
+    
+    // Общий метод для отображения уведомления о разблокированном достижении
+    private func showAchievementNotification(_ achievement: Achievement) {
+        unlockedAchievement = achievement
+        showingAchievementNotification = true
     }
 }
 

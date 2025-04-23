@@ -27,18 +27,29 @@ import SwiftUI
             }
         }
         
-        // In a real implementation, we would update progress of each achievement
-        // based on stored game statistics. For now, using placeholder logic.
+        // Update progress for achievements based on game statistics
         
-        // Example for Land Invader achievement
+        // First Step - захват первой территории
+        if let index = achievements.firstIndex(where: { $0.id == "firstStep" }) {
+            achievements[index].progress = gameState.regionsCaptureDcount > 0 ? 1 : 0
+        }
+        
+        // First Victory - первая победа в матче
+        if let index = achievements.firstIndex(where: { $0.id == "firstVictory" }) {
+            achievements[index].progress = gameState.gamesWonCount > 0 ? 1 : 0
+        }
+        
+        // Land Invader - захват 500 регионов
         if let index = achievements.firstIndex(where: { $0.id == "landInvader" }) {
             achievements[index].progress = min(gameState.regionsCaptureDcount, 500)
         }
         
-        // Example for Destroyer achievement
+        // Destroyer - выигрыш 10 игр
         if let index = achievements.firstIndex(where: { $0.id == "destroyer" }) {
             achievements[index].progress = min(gameState.gamesWonCount, 10)
         }
+        
+        // Battle to the End - оставляем без изменений, как указано в задании
     }
     
     // Check if achievement is completed (based on progress)
