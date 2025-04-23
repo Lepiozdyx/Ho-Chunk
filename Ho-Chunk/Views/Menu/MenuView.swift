@@ -4,6 +4,7 @@ import SwiftUI
 struct MenuView: View {
     @EnvironmentObject private var appViewModel: AppViewModel
     @StateObject private var svm = SettingsViewModel.shared
+    @State private var showDailyTaskView: Bool = false
     
     var body: some View {
         ZStack {
@@ -47,13 +48,21 @@ struct MenuView: View {
                     
                     Button {
                         svm.play()
-                        //
+                        showDailyTaskView = true
                     } label: {
                         ActionView(width: 190, height: 90, text: "Daily", textSize: 24)
                     }
                 }
             }
             .padding()
+            
+            if showDailyTaskView {
+                DailyTaskView(isPresented: $showDailyTaskView)
+                    .environmentObject(appViewModel)
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: showDailyTaskView)
+                    .zIndex(100)
+            }
         }
     }
 }

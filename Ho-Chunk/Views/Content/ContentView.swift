@@ -47,8 +47,6 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            appViewModel.checkDailyBonus()
-            
             if settings.musicIsOn {
                 settings.playMusic()
             }

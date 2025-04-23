@@ -7,23 +7,23 @@ class OrientationViewModel {
     
     private init() {}
     
-    func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
-        InterfaceOrientationHelper.orientationMask = orientation
-        
-        if orientation != .all {
-            InterfaceOrientationHelper.isAutoRotationEnabled = false
-        } else {
-            InterfaceOrientationHelper.isAutoRotationEnabled = true
-        }
-        
-        UIViewController.attemptRotationToDeviceOrientation()
-    }
-    
-    func unlockOrientation() {
-        InterfaceOrientationHelper.orientationMask = .all
-        InterfaceOrientationHelper.isAutoRotationEnabled = true
-        UIViewController.attemptRotationToDeviceOrientation()
-    }
+//    func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
+//        InterfaceOrientationHelper.orientationMask = orientation
+//        
+//        if orientation != .all {
+//            InterfaceOrientationHelper.isAutoRotationEnabled = false
+//        } else {
+//            InterfaceOrientationHelper.isAutoRotationEnabled = true
+//        }
+//        
+//        UIViewController.attemptRotationToDeviceOrientation()
+//    }
+//    
+//    func unlockOrientation() {
+//        InterfaceOrientationHelper.orientationMask = .all
+//        InterfaceOrientationHelper.isAutoRotationEnabled = true
+//        UIViewController.attemptRotationToDeviceOrientation()
+//    }
     
     func lockLandscape() {
         InterfaceOrientationHelper.orientationMask = .landscape
