@@ -11,6 +11,10 @@ struct GameState: Codable {
     var currentThemeId: String = "desert" // Текущая выбранная тема
     var tutorialCompleted: Bool = false
     
+    var regionsCaptureDcount: Int = 0    // For "Land Invader" achievement
+    var gamesWonCount: Int = 0           // For "Destroyer" achievement
+    var wasWinningWhileOutnumbered: Bool = false // For "Battle to the End" achievement
+    
     var maxAvailableLevel: Int {
         return min(maxCompletedLevel + 1, GameLevel.levels.count)
     }

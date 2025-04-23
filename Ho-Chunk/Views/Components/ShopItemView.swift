@@ -15,7 +15,7 @@ struct ShopItemView: View {
         VStack {
             Image(.frame)
                 .resizable()
-                .frame(maxWidth: 200, maxHeight: 200)
+                .frame(maxWidth: 250, maxHeight: 250)
                 .overlay {
                     Image(theme.imageResource)
                         .resizable()
@@ -34,7 +34,7 @@ struct ShopItemView: View {
             } label: {
                 Image(.button)
                     .resizable()
-                    .frame(maxWidth: 200, maxHeight: 75)
+                    .frame(maxWidth: 200, maxHeight: 65)
                     .overlay {
                         if isPurchased {
                             Text(isSelected ? "used" : "use")

@@ -3,12 +3,12 @@ import SwiftUI
 
 struct AchiView: View {
     @EnvironmentObject private var appViewModel: AppViewModel
-    @StateObject private var viewModel = ShopViewModel()
+    @StateObject private var viewModel = AchievementViewModel()
     @StateObject private var svm = SettingsViewModel.shared
     
     var body: some View {
         ZStack {
-            BgView(name: viewModel.currentTheme.imageResource, isBlur: false)
+            BgView(name: appViewModel.currentTheme.imageResource, isBlur: false)
             
             VStack {
                 HStack {
@@ -52,9 +52,17 @@ struct AchiView: View {
                 
                 Spacer()
                 
-                HStack(spacing: 20) {
-                    ForEach(viewModel.availableThemes) { theme in
-                        // Achi items
+                HStack(spacing: 10) {
+                    ForEach(viewModel.achievements) { achievement in
+                        AchievementItemView(
+                            achievement: achievement,
+                            isCompleted: viewModel.isAchievementCompleted(id: achievement.id),
+                            isClaimed: viewModel.isAchievementClaimed(id: achievement.id),
+                            canClaim: viewModel.canClaimAchievement(id: achievement.id),
+                            onClaim: {
+                                viewModel.claimAchievement(id: achievement.id)
+                            }
+                        )
                     }
                 }
                 

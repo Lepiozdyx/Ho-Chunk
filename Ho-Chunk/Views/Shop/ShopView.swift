@@ -52,7 +52,7 @@ struct ShopView: View {
                 
                 Spacer()
                 
-                HStack(spacing: 20) {
+                HStack(spacing: 10) {
                     ForEach(viewModel.availableThemes) { theme in
                         ShopItemView(
                             theme: theme,
