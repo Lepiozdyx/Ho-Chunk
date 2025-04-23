@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var appViewModel = AppViewModel()
     @StateObject private var settings = SettingsViewModel.shared
+    private var orientation = OrientationViewModel.shared
     
     @Environment(\.scenePhase) private var phase
     
@@ -12,22 +13,37 @@ struct ContentView: View {
             case .menu:
                 MenuView()
                     .environmentObject(appViewModel)
+                    .onAppear {
+                        orientation.lockLandscape()
+                    }
                 
             case .game:
                 GameView()
                     .environmentObject(appViewModel)
+                    .onAppear {
+                        orientation.lockLandscape()
+                    }
                 
             case .settings:
                 SettingsView()
                     .environmentObject(appViewModel)
+                    .onAppear {
+                        orientation.lockLandscape()
+                    }
                 
             case .shop:
                 ShopView()
                     .environmentObject(appViewModel)
+                    .onAppear {
+                        orientation.lockLandscape()
+                    }
                 
             case .achievements:
                 AchiView()
                     .environmentObject(appViewModel)
+                    .onAppear {
+                        orientation.lockLandscape()
+                    }
             }
         }
         .onAppear {

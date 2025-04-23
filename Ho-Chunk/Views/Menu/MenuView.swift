@@ -44,6 +44,13 @@ struct MenuView: View {
                     } label: {
                         ActionView(width: 190, height: 90, text: "achi", textSize: 24)
                     }
+                    
+                    Button {
+                        svm.play()
+                        //
+                    } label: {
+                        ActionView(width: 190, height: 90, text: "Daily", textSize: 24)
+                    }
                 }
             }
             .padding()
