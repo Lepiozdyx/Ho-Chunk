@@ -15,6 +15,10 @@ struct GameView: View {
             VStack {
                 GameTopBarView(playerControlPercentage: viewModel.calculatePlayerControlPercentage())
                 Spacer()
+                
+                Text("lvl \(appViewModel.gameLevel)")
+                    .customFont(18)
+                    .padding(.bottom, 4)
             }
             
             // Кнопка паузы

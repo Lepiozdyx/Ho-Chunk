@@ -7,7 +7,6 @@ struct GameTopBarView: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            // Область игрока (синяя)
             Rectangle()
                 .fill(
                     LinearGradient(
@@ -17,6 +16,12 @@ struct GameTopBarView: View {
                     )
                 )
                 .frame(width: 300 * CGFloat(animatedPercentage))
+                .overlay(alignment: .leading) {
+                    Image(.indianLogo)
+                        .resizable()
+                        .scaledToFit()
+                        .padding(.leading, 8)
+                }
             
             // Область CPU (красная)
             Rectangle()
@@ -28,6 +33,12 @@ struct GameTopBarView: View {
                     )
                 )
                 .frame(width: 300 * CGFloat(1 - animatedPercentage))
+                .overlay(alignment: .trailing) {
+                    Image(.targetLogo)
+                        .resizable()
+                        .scaledToFit()
+                        .padding(.trailing, 8)
+                }
         }
         .frame(height: 15)
         .clipShape(Capsule())
