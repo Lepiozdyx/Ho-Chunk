@@ -2,6 +2,9 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var appViewModel = AppViewModel()
+    @StateObject private var settings = SettingsViewModel.shared
+    
+    @Environment(\.scenePhase) private var phase
     
     var body: some View {
         ZStack {
@@ -15,11 +18,11 @@ struct ContentView: View {
                     .environmentObject(appViewModel)
                 
             case .settings:
-                Text("Settings") // Заглушка для настроек
+                SettingsView()
                     .environmentObject(appViewModel)
                 
             case .shop:
-                Text("Shop") // Заглушка для магазина
+                ShopView()
                     .environmentObject(appViewModel)
                 
             case .achievements:
@@ -30,6 +33,20 @@ struct ContentView: View {
         .onAppear {
             // Проверяем ежедневный бонус при запуске
             appViewModel.checkDailyBonus()
+            
+            if settings.musicIsOn {
+                settings.playMusic()
+            }
+        }
+        .onChange(of: phase) { newPhase in
+            switch newPhase {
+            case .active:
+                settings.playMusic()
+            case .background, .inactive:
+                settings.stopMusic()
+            @unknown default:
+                break
+            }
         }
     }
 }

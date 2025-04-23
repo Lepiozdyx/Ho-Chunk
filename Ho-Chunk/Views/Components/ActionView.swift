@@ -22,7 +22,7 @@ struct ActionView: View {
                 .overlay {
                     Text(text)
                         .customFont(textSize)
-                        .offset(y: -7)
+                        .offset(y: -5)
                 }
             
             if isQuill {
@@ -32,7 +32,6 @@ struct ActionView: View {
                     .offset(x: 25)
             }
         }
-            
     }
 }
 

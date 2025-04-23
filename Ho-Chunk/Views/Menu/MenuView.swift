@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MenuView: View {
     @EnvironmentObject private var appViewModel: AppViewModel
+    @StateObject private var svm = SettingsViewModel.shared
     
     var body: some View {
         ZStack {
@@ -14,6 +15,7 @@ struct MenuView: View {
                     Spacer()
                     
                     Button {
+                        svm.play()
                         appViewModel.startGame()
                     } label: {
                         ActionView(width: 320, height: 150, text: "start", textSize: 32, isQuill: true)
@@ -22,18 +24,21 @@ struct MenuView: View {
                 
                 HStack {
                     Button {
+                        svm.play()
                         appViewModel.navigateTo(.settings)
                     } label: {
                         ActionView(width: 190, height: 90, text: "settings", textSize: 24)
                     }
                     
                     Button {
+                        svm.play()
                         appViewModel.navigateTo(.shop)
                     } label: {
                         ActionView(width: 190, height: 90, text: "shop", textSize: 24)
                     }
                     
                     Button {
+                        svm.play()
                         appViewModel.navigateTo(.achievements)
                     } label: {
                         ActionView(width: 190, height: 90, text: "achi", textSize: 24)
