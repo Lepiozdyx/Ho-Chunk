@@ -26,12 +26,11 @@ struct ContentView: View {
                     .environmentObject(appViewModel)
                 
             case .achievements:
-                Text("Achievements") // Заглушка для достижений
+                AchiView()
                     .environmentObject(appViewModel)
             }
         }
         .onAppear {
-            // Проверяем ежедневный бонус при запуске
             appViewModel.checkDailyBonus()
             
             if settings.musicIsOn {

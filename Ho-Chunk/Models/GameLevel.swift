@@ -59,7 +59,7 @@ struct GameLevel {
             RegionDefinition(shape: .vector9, position: CGPoint(x: 446, y: 296), width: 160, height: 100, owner: .neutral, initialTroops: 0),
         ]),
         GameLevel(id: 4, regions: [
-            RegionDefinition(shape: .vector3, position: CGPoint(x: 577, y: 144), width: 210, height: 80, owner: .player, initialTroops: 0),
+            RegionDefinition(shape: .vector3, position: CGPoint(x: 577, y: 130), width: 210, height: 100, owner: .player, initialTroops: 0),
             RegionDefinition(shape: .vector4, position: CGPoint(x: 526, y: 248), width: 120, height: 120, owner: .player, initialTroops: 0),
 
             RegionDefinition(shape: .vector6, position: CGPoint(x: 150, y: 79), width: 170, height: 100, owner: .cpu, initialTroops: 0),
