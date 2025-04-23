@@ -1,3 +1,4 @@
+
 import SwiftUI
 
 struct MenuView: View {
@@ -6,7 +7,7 @@ struct MenuView: View {
     
     var body: some View {
         ZStack {
-            BgView(name: .desertBg, isMenu: true)
+            BgView(name: appViewModel.currentTheme.imageResource, isMenu: true)
             
             VStack {
                 Spacer()

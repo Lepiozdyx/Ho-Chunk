@@ -1,3 +1,4 @@
+
 import SwiftUI
 import Combine
 
@@ -17,6 +18,11 @@ class AppViewModel: ObservableObject {
         
         // Проверяем ежедневный бонус при запуске
         checkDailyBonus()
+    }
+    
+    // Получить текущую тему
+    var currentTheme: BackgroundTheme {
+        return BackgroundTheme.getTheme(id: gameState.currentThemeId)
     }
     
     // Методы навигации

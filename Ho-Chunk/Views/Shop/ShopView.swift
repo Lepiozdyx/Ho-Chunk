@@ -3,11 +3,12 @@ import SwiftUI
 
 struct ShopView: View {
     @EnvironmentObject private var appViewModel: AppViewModel
+    @StateObject private var viewModel = ShopViewModel()
     @StateObject private var svm = SettingsViewModel.shared
     
     var body: some View {
         ZStack {
-            BgView(name: .desertBg, isBlur: false)
+            BgView(name: viewModel.currentTheme.imageResource, isBlur: false)
             
             VStack {
                 HStack {
@@ -38,7 +39,7 @@ struct ShopView: View {
                 }
                 Spacer()
             }
-            .padding([.top, .leading])
+            .padding([.top, .horizontal])
             
             VStack {
                 Image(.textUnderlay)
@@ -51,79 +52,29 @@ struct ShopView: View {
                 
                 Spacer()
                 
-                HStack {
-                    // Extract to reusable view
-                    VStack {
-                        Image(.frame)
-                            .resizable()
-                            .frame(maxWidth: 200, maxHeight: 200)
-                            .overlay {
-                                Image(.desertBg)
-                                    .resizable()
-                                    .padding(6)
+                HStack(spacing: 20) {
+                    ForEach(viewModel.availableThemes) { theme in
+                        ShopItemView(
+                            theme: theme,
+                            isPurchased: viewModel.isThemePurchased(theme.id),
+                            isSelected: viewModel.isThemeSelected(theme.id),
+                            canAfford: appViewModel.coins >= theme.price,
+                            onBuy: {
+                                viewModel.purchaseTheme(theme.id)
+                            },
+                            onSelect: {
+                                viewModel.selectTheme(theme.id)
                             }
-                        
-                        Button {
-                            svm.play()
-                            // by and setup bg image to GameView() action
-                        } label: {
-                            Image(.button)
-                                .resizable()
-                                .frame(maxWidth: 200, maxHeight: 75)
-                                .overlay {
-                                    HStack {
-                                        Image(.coin)
-                                            .resizable()
-                                            .frame(width: 25, height: 25)
-                                        
-                                        Text("100")
-                                            .customFont(14)
-                                    }
-                                    .offset(y: -5)
-                                }
-                        }
+                        )
                     }
-                    
-                    Image(.frame)
-                        .resizable()
-                        .frame(maxWidth: 200, maxHeight: 200)
-                        .overlay {
-                            Image(.nightBg)
-                                .resizable()
-                                .padding(6)
-                        }
-                    
-                    Image(.frame)
-                        .resizable()
-                        .frame(maxWidth: 200, maxHeight: 200)
-                        .overlay {
-                            Image(.fallBg)
-                                .resizable()
-                                .padding(6)
-                        }
-                    
-                    Image(.frame)
-                        .resizable()
-                        .frame(maxWidth: 200, maxHeight: 200)
-                        .overlay {
-                            Image(.wildwest1Bg)
-                                .resizable()
-                                .padding(6)
-                        }
-                    
-                    Image(.frame)
-                        .resizable()
-                        .frame(maxWidth: 200, maxHeight: 200)
-                        .overlay {
-                            Image(.wildwest2Bg)
-                                .resizable()
-                                .padding(6)
-                        }
                 }
                 
                 Spacer()
             }
             .padding()
+        }
+        .onAppear {
+            viewModel.appViewModel = appViewModel
         }
     }
 }

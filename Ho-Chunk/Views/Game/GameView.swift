@@ -8,8 +8,8 @@ struct GameView: View {
     
     var body: some View {
         ZStack {
-            // Фон
-            BgView(name: .desertBg, isBlur: true)
+            // Фон - используем текущую выбранную тему
+            BgView(name: appViewModel.currentTheme.imageResource, isBlur: true)
             
             // Верхний индикатор прогресса
             VStack {
@@ -127,7 +127,7 @@ struct GameView: View {
         .onAppear {
             // Сохраняем ссылку на viewModel в appViewModel и устанавливаем связь с AppViewModel
             appViewModel.gameViewModel = viewModel
-            viewModel.appViewModel = appViewModel // Добавляем эту строку, чтобы установить связь
+            viewModel.appViewModel = appViewModel
             
             // При появлении инициализируем уровень
             viewModel.setupLevel(appViewModel.gameLevel)

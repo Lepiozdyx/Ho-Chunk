@@ -7,7 +7,7 @@ struct SettingsView: View {
     
     var body: some View {
         ZStack {
-            BgView(name: .desertBg, isBlur: false)
+            BgView(name: appViewModel.currentTheme.imageResource, isBlur: false)
             
             VStack {
                 HStack {
@@ -53,7 +53,8 @@ struct SettingsView: View {
                                 
                                 ToggleButton(isON: svm.soundIsOn) {
                                     svm.play()
-                                    svm.toggleSound()                           }
+                                    svm.toggleSound()
+                                }
                             }
                         }
                     
@@ -67,7 +68,8 @@ struct SettingsView: View {
                                 
                                 ToggleButton(isON: svm.musicIsOn) {
                                     svm.play()
-                                    svm.toggleMusic()                           }
+                                    svm.toggleMusic()
+                                }
                             }
                         }
                 }

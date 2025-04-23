@@ -1,3 +1,4 @@
+
 import Foundation
 
 struct GameState: Codable {
@@ -6,7 +7,8 @@ struct GameState: Codable {
     var coins: Int = 0
     var lastLoginDate: Date?
     var completedAchievements: [String] = []
-    var purchasedThemes: [String] = []
+    var purchasedThemes: [String] = ["desert"] // По умолчанию тема пустыни уже куплена
+    var currentThemeId: String = "desert" // Текущая выбранная тема
     var tutorialCompleted: Bool = false
     
     var maxAvailableLevel: Int {

@@ -33,18 +33,18 @@ struct GameLevel {
             RegionDefinition(shape: .vector7, position: CGPoint(x: 427, y: 119), width: 170, height: 140, owner: .neutral, initialTroops: 0),
         ]),
         GameLevel(id: 2, regions: [
-            RegionDefinition(shape: .vector8, position: CGPoint(x: 568, y: 282), width: 170, height: 120, owner: .player, initialTroops: 0),
-            RegionDefinition(shape: .vector9, position: CGPoint(x: 569, y: 207), width: 160, height: 90, owner: .player, initialTroops: 0),
-            RegionDefinition(shape: .vector10, position: CGPoint(x: 489, y: 113), width: 120, height: 130, owner: .player, initialTroops: 0),
+            RegionDefinition(shape: .vector8, position: CGPoint(x: 568, y: 282), width: 165, height: 115, owner: .player, initialTroops: 0),
+            RegionDefinition(shape: .vector9, position: CGPoint(x: 569, y: 207), width: 155, height: 85, owner: .player, initialTroops: 0),
+            RegionDefinition(shape: .vector10, position: CGPoint(x: 489, y: 113), width: 115, height: 125, owner: .player, initialTroops: 0),
 
-            RegionDefinition(shape: .vector1, position: CGPoint(x: 195, y: 311), width: 210, height: 110, owner: .cpu, initialTroops: 0),
+            RegionDefinition(shape: .vector1, position: CGPoint(x: 195, y: 311), width: 205, height: 105, owner: .cpu, initialTroops: 0),
 
-            RegionDefinition(shape: .vector2, position: CGPoint(x: 208, y: 188), width: 140, height: 160, owner: .neutral, initialTroops: 0),
-            RegionDefinition(shape: .vector3, position: CGPoint(x: 306, y: 265), width: 140, height: 150, owner: .neutral, initialTroops: 0),
-            RegionDefinition(shape: .vector4, position: CGPoint(x: 274, y: 115), width: 130, height: 150, owner: .neutral, initialTroops: 0),
-            RegionDefinition(shape: .vector5, position: CGPoint(x: 429, y: 292), width: 155, height: 125, owner: .neutral, initialTroops: 0),
-            RegionDefinition(shape: .vector6, position: CGPoint(x: 399, y: 217), width: 125, height: 155, owner: .neutral, initialTroops: 0),
-            RegionDefinition(shape: .vector7, position: CGPoint(x: 371, y: 101), width: 150, height: 140, owner: .neutral, initialTroops: 0)
+            RegionDefinition(shape: .vector2, position: CGPoint(x: 208, y: 188), width: 135, height: 155, owner: .neutral, initialTroops: 0),
+            RegionDefinition(shape: .vector3, position: CGPoint(x: 306, y: 265), width: 135, height: 145, owner: .neutral, initialTroops: 0),
+            RegionDefinition(shape: .vector4, position: CGPoint(x: 274, y: 115), width: 125, height: 145, owner: .neutral, initialTroops: 0),
+            RegionDefinition(shape: .vector5, position: CGPoint(x: 429, y: 292), width: 150, height: 120, owner: .neutral, initialTroops: 0),
+            RegionDefinition(shape: .vector6, position: CGPoint(x: 399, y: 217), width: 120, height: 150, owner: .neutral, initialTroops: 0),
+            RegionDefinition(shape: .vector7, position: CGPoint(x: 371, y: 101), width: 145, height: 135, owner: .neutral, initialTroops: 0)
         ]),
         GameLevel(id: 3, regions: [
             RegionDefinition(shape: .vector2, position: CGPoint(x: 574, y: 276), width: 110, height: 120, owner: .player, initialTroops: 0),
