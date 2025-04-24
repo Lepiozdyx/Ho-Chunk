@@ -2,8 +2,25 @@
 import SwiftUI
 
 struct LoadingView: View {
+    @State private var isPulsing = false
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            BgView(name: .desertBg)
+            
+            VStack {
+                Spacer()
+                
+                Text("Loading...")
+                    .customFont(40, color: .white)
+                    .scaleEffect(isPulsing ? 1.04 : 0.9)
+                    .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: isPulsing)
+                    .onAppear {
+                        isPulsing = true
+                    }
+            }
+            .padding(.bottom)
+        }
     }
 }
 

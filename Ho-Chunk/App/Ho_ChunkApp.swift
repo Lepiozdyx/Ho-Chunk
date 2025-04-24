@@ -8,7 +8,7 @@ struct Ho_ChunkApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
                 .preferredColorScheme(.light)
         }
     }

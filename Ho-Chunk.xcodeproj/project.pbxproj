@@ -10,9 +10,22 @@
 		FAD0B1F52DB28BFA004A597B /* Ho-Chunk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ho-Chunk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FA7B10B42DBA9C3A006E9BD4 /* Exceptions for "Ho-Chunk" folder in "Ho-Chunk" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FAD0B1F42DB28BFA004A597B /* Ho-Chunk */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FAD0B1F72DB28BFA004A597B /* Ho-Chunk */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FA7B10B42DBA9C3A006E9BD4 /* Exceptions for "Ho-Chunk" folder in "Ho-Chunk" target */,
+			);
 			path = "Ho-Chunk";
 			sourceTree = "<group>";
 		};
@@ -253,6 +266,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Ho-Chunk/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Ho-Chunk Gaming";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -286,6 +300,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Ho-Chunk/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Ho-Chunk Gaming";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
