@@ -111,6 +111,7 @@ class AppViewModel: ObservableObject {
     func saveGameState() {
         gameState.coins = coins
         gameState.currentLevel = gameLevel
+        print("[AppViewModel] Сохранение состояния. Монеты: \(coins), дата награды: \(gameState.lastDailyRewardClaimDate?.description ?? "nil")")
         gameState.save()
     }
     

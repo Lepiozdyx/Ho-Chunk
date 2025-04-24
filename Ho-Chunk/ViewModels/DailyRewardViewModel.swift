@@ -8,59 +8,88 @@ import Combine
     @Published var isRewardAvailable: Bool = false
     @Published var isClaimingReward: Bool = false
     
-    
     private var timer: AnyCancellable?
     weak var appViewModel: AppViewModel?
     private let dailyRewardAmount: Int = 20
     
-    init(appViewModel: AppViewModel) {
-        self.appViewModel = appViewModel
-        updateState()
+    init() {
         startTimer()
     }
     
     deinit {
-        cleanupTimer()
+        timer?.cancel()
+        timer = nil
     }
     
-    func claimReward() {
-        guard isRewardAvailable, !isClaimingReward, let appViewModel = appViewModel else { return }
+    func claimReward() -> Bool {
+        guard let appViewModel = appViewModel else {
+            print("[DailyReward] Не удалось получить награду: appViewModel = nil")
+            return false
+        }
+        
+        guard isRewardAvailable && !isClaimingReward else {
+            print("[DailyReward] Не удалось получить награду: доступность=\(isRewardAvailable), получение=\(isClaimingReward)")
+            return false
+        }
         
         isClaimingReward = true
+        print("[DailyReward] Начинаем получение награды")
         
+        // Добавляем монеты к текущему значению
         appViewModel.coins += dailyRewardAmount
+        print("[DailyReward] Добавлено \(dailyRewardAmount) монет, всего: \(appViewModel.coins)")
         
+        // Устанавливаем текущую дату получения
         var gameState = appViewModel.gameState
         gameState.lastDailyRewardClaimDate = Date()
         gameState.coins = appViewModel.coins
+        
+        // Явно сохраняем в UserDefaults
         gameState.save()
+        
+        // Обновляем appViewModel
         appViewModel.gameState = gameState
         
+        print("[DailyReward] Дата получения награды установлена: \(gameState.lastDailyRewardClaimDate!)")
+        
+        // Обновляем наше состояние
         updateState()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            self?.isClaimingReward = false
-        }
+        return true
     }
     
     func updateState() {
-        guard let appViewModel = appViewModel else { return }
+        guard let appViewModel = appViewModel else {
+            isRewardAvailable = false
+            remainingTime = "Loading..."
+            return
+        }
         
         let lastClaimDate = appViewModel.gameState.lastDailyRewardClaimDate
-        isRewardAvailable = lastClaimDate == nil ||
-                            !Calendar.current.isDateInToday(lastClaimDate!)
+        print("[DailyReward] Дата последнего получения: \(lastClaimDate?.description ?? "не установлена")")
         
         if let lastDate = lastClaimDate {
-            let remainingSeconds = calculateRemainingTime(from: lastDate)
-            remainingTime = formatRemainingTime(remainingSeconds)
+            // Проверяем, получена ли награда сегодня
+            let isToday = Calendar.current.isDateInToday(lastDate)
+            isRewardAvailable = !isToday
+            
+            if isToday {
+                let remainingSeconds = calculateRemainingTime(from: lastDate)
+                remainingTime = formatRemainingTime(remainingSeconds)
+                print("[DailyReward] Награда недоступна. Осталось: \(remainingTime)")
+            } else {
+                remainingTime = "Available"
+                print("[DailyReward] Награда доступна: дата не сегодня")
+            }
         } else {
+            isRewardAvailable = true
             remainingTime = "Available"
+            print("[DailyReward] Награда доступна: дата не установлена")
         }
     }
     
-    private func startTimer() {
-        stopTimer()
-
+    func startTimer() {
+        timer?.cancel()
         timer = Timer.publish(every: 60.0, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
@@ -68,24 +97,12 @@ import Combine
             }
     }
     
-    private func stopTimer() {
-        timer?.cancel()
-        timer = nil
-    }
-    
-    nonisolated private func cleanupTimer() {
-        DispatchQueue.main.async { [weak self] in
-            self?.timer?.cancel()
-            self?.timer = nil
-        }
-    }
-    
     private func calculateRemainingTime(from date: Date) -> TimeInterval {
         let calendar = Calendar.current
-        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: date)) {
-            return max(0, tomorrow.timeIntervalSince(Date()))
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: date)) else {
+            return 0
         }
-        return 0
+        return max(0, tomorrow.timeIntervalSince(Date()))
     }
     
     private func formatRemainingTime(_ timeInterval: TimeInterval) -> String {
@@ -95,8 +112,7 @@ import Combine
         
         let hours = Int(timeInterval) / 3600
         let minutes = (Int(timeInterval) % 3600) / 60
-        let formattedMinutes = minutes < 10 ? "0\(minutes)" : "\(minutes)"
         
-        return "\(hours):\(formattedMinutes)"
+        return String(format: "%02d:%02d", hours, minutes)
     }
 }

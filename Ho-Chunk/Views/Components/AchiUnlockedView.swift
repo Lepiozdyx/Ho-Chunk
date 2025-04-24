@@ -5,22 +5,21 @@ struct AchiUnlockedView: View {
     let achievement: Achievement
     @Binding var isShowing: Bool
     
-    @State private var offset: CGFloat = 200
+    @State private var offset: CGFloat = -200
     @State private var opacity: Double = 0
     
     var body: some View {
         VStack {
-            Spacer()
-            
             HStack {
                 Spacer()
                 
                 Image(achievement.imageResource)
                     .resizable()
-                    .frame(width: 35, height: 40)
+                    .frame(width: 40, height: 45)
             }
+            Spacer()
         }
-        .padding([.horizontal, .bottom], 8)
+        .padding([.horizontal, .top], 8)
         .offset(y: offset)
         .opacity(opacity)
         .onAppear {
@@ -31,7 +30,7 @@ struct AchiUnlockedView: View {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 withAnimation(.easeOut(duration: 0.5)) {
-                    offset = 200
+                    offset = -200
                     opacity = 0
                 }
                 

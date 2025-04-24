@@ -71,6 +71,7 @@ struct TipsView: View {
             
             Spacer()
         }
+        .padding([.leading, .bottom])
     }
 }
 
