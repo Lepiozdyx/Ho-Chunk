@@ -10,7 +10,6 @@ struct GameView: View {
     @State private var showingAchievementNotification: Bool = false
     @State private var unlockedAchievement: Achievement? = nil
     
-    // Добавляем сервис масштабирования
     @StateObject private var scalingService = GameScalingService.shared
     
     var body: some View {
@@ -18,7 +17,6 @@ struct GameView: View {
             ZStack {
                 BgView(name: appViewModel.currentTheme.imageResource, isBlur: true)
                 
-                // Контент игрового экрана
                 VStack {
                     GameTopBarView(playerControlPercentage: viewModel.calculatePlayerControlPercentage())
                     Spacer()
@@ -28,7 +26,6 @@ struct GameView: View {
                         .padding(.bottom, 4)
                 }
                 
-                // Кнопка паузы
                 VStack {
                     HStack {
                         Button {
@@ -50,7 +47,6 @@ struct GameView: View {
                 }
                 .padding([.top, .horizontal])
                 
-                // Масштабируемая область игрового поля
                 ZStack {
                     ForEach(viewModel.regions) { region in
                         RegionView(region: region, scalingService: scalingService)
@@ -61,7 +57,6 @@ struct GameView: View {
                                             if dragStartRegion == nil || dragStartRegion?.id == region.id {
                                                 dragStartRegion = region
                                                 
-                                                // Преобразуем координаты в системе координат игрового поля
                                                 let locationInGameSpace = CGPoint(
                                                     x: (value.location.x - scalingService.offsetX) / scalingService.scaleMultiplier,
                                                     y: (value.location.y - scalingService.offsetY) / scalingService.scaleMultiplier
@@ -72,7 +67,6 @@ struct GameView: View {
                                     }
                                     .onEnded { value in
                                         if let dragStartRegion = dragStartRegion {
-                                            // Преобразуем координаты в системе координат игрового поля
                                             let locationInGameSpace = CGPoint(
                                                 x: (value.location.x - scalingService.offsetX) / scalingService.scaleMultiplier,
                                                 y: (value.location.y - scalingService.offsetY) / scalingService.scaleMultiplier
@@ -108,7 +102,6 @@ struct GameView: View {
                     }
                 }
                 
-                // Оверлеи остаются без изменений
                 if viewModel.showTutorialTips {
                     TipsView(showTips: $viewModel.showTutorialTips)
                         .transition(.opacity)
@@ -143,7 +136,6 @@ struct GameView: View {
                 }
             }
             .onAppear {
-                // Рассчитываем масштаб при появлении
                 scalingService.calculateScaling(for: geometry.size)
                 
                 appViewModel.gameViewModel = viewModel
@@ -152,7 +144,6 @@ struct GameView: View {
                 viewModel.setupLevel(appViewModel.gameLevel)
             }
             .onChange(of: geometry.size) { newSize in
-                // Обновляем масштаб при изменении размера экрана
                 scalingService.calculateScaling(for: newSize)
             }
             .onDisappear {
@@ -161,8 +152,6 @@ struct GameView: View {
         }
     }
     
-    // Методы checkFirstStepAchievement, checkFirstVictoryAchievement и showAchievementNotification
-    // остаются без изменений
     private func checkFirstStepAchievement() {
         var gameState = GameState.load()
         

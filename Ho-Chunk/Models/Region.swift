@@ -19,16 +19,13 @@ class Region: Identifiable, ObservableObject {
         self.width = width
         self.height = height
         self.owner = owner
-        // Если регион нейтральный, устанавливаем 0 войск, иначе используем переданное значение
         self.troopCount = owner == .neutral ? 0 : initialTroops
         
-        // Начинаем генерировать войска, если регион принадлежит игроку или CPU
         if owner != .neutral {
             startTroopGeneration()
         }
     }
     
-    // метод для очистки ресурсов при уничтожении объекта
     deinit {
         stopTroopGeneration()
     }
@@ -36,14 +33,12 @@ class Region: Identifiable, ObservableObject {
     func startTroopGeneration() {
         stopTroopGeneration()
         
-        // Генерируем 1 отряд в секунду для не-нейтральных регионов
         if owner != .neutral {
             timer = Timer.publish(every: 1.0, on: .main, in: .common)
                 .autoconnect()
                 .sink { [weak self] _ in
                     guard let self = self else { return }
                     self.troopCount += 1
-                    print("Регион \(self.owner): генерация войск, текущее количество: \(self.troopCount)")
                 }
         }
     }
@@ -57,7 +52,6 @@ class Region: Identifiable, ObservableObject {
         stopTroopGeneration()
         
         owner = newOwner
-        print("Владелец региона изменился на \(newOwner)")
         
         if newOwner != .neutral {
             startTroopGeneration()

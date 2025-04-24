@@ -95,7 +95,6 @@ struct DailyTaskView: View {
             setup()
         }
         .onChange(of: viewModel.isRewardAvailable) { newValue in
-            print("[DailyTaskView] Доступность награды изменилась: \(newValue)")
             rewardClaimed = !newValue && appViewModel.gameState.lastDailyRewardClaimDate != nil
         }
     }
@@ -105,8 +104,6 @@ struct DailyTaskView: View {
         viewModel.updateState()
         
         rewardClaimed = !viewModel.isRewardAvailable && appViewModel.gameState.lastDailyRewardClaimDate != nil
-        
-        print("[DailyTaskView] Настройка завершена. Награда доступна: \(viewModel.isRewardAvailable), уже получена: \(rewardClaimed)")
     }
     
     private func handleChestTap() {

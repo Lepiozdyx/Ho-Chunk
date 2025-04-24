@@ -30,7 +30,6 @@ struct AchievementItemView: View {
                             .customFont(10, color: .black.opacity(0.6))
                             .padding(.horizontal, 4)
                         
-                        // Show progress for achievements with targets > 1
                         if achievement.target > 1 {
                             Text("\(achievement.progress)/\(achievement.target)")
                                 .customFont(10)

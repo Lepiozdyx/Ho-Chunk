@@ -4,12 +4,11 @@ struct TipsView: View {
     @Binding var showTips: Bool
     @State private var currentTipIndex: Int = 0
     
-    // Массив подсказок для обучения
     let tips = [
         "Welcome to Ho-Chunk, Warrior! In this game, you are the leader of the tribe and your job is to conquer territories.",
         "Your regions (blue) generate 1 soldier every second. The more regions you have, the faster your army grows!",
         "To move troops, tap your region and gesture drag to any other region on the map.",
-        "You can capture neutral regions (gray) with any number of troops, but you need more troops than they have to capture enemy regions.",
+        "You can capture neutral regions (grey) with any number of troops, but you need more troops than they have to capture enemy regions.",
         "Your goal is to conquer the entire map. On the next level, a real opponent awaits you. Act without delay, the enemy is not slumbering! Good luck!"
     ]
     

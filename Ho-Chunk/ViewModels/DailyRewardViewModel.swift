@@ -23,36 +23,24 @@ import Combine
     
     func claimReward() -> Bool {
         guard let appViewModel = appViewModel else {
-            print("[DailyReward] Не удалось получить награду: appViewModel = nil")
             return false
         }
         
         guard isRewardAvailable && !isClaimingReward else {
-            print("[DailyReward] Не удалось получить награду: доступность=\(isRewardAvailable), получение=\(isClaimingReward)")
             return false
         }
         
         isClaimingReward = true
-        print("[DailyReward] Начинаем получение награды")
         
-        // Добавляем монеты к текущему значению
         appViewModel.coins += dailyRewardAmount
-        print("[DailyReward] Добавлено \(dailyRewardAmount) монет, всего: \(appViewModel.coins)")
         
-        // Устанавливаем текущую дату получения
         var gameState = appViewModel.gameState
         gameState.lastDailyRewardClaimDate = Date()
         gameState.coins = appViewModel.coins
-        
-        // Явно сохраняем в UserDefaults
         gameState.save()
         
-        // Обновляем appViewModel
         appViewModel.gameState = gameState
         
-        print("[DailyReward] Дата получения награды установлена: \(gameState.lastDailyRewardClaimDate!)")
-        
-        // Обновляем наше состояние
         updateState()
         
         return true
@@ -66,25 +54,20 @@ import Combine
         }
         
         let lastClaimDate = appViewModel.gameState.lastDailyRewardClaimDate
-        print("[DailyReward] Дата последнего получения: \(lastClaimDate?.description ?? "не установлена")")
         
         if let lastDate = lastClaimDate {
-            // Проверяем, получена ли награда сегодня
             let isToday = Calendar.current.isDateInToday(lastDate)
             isRewardAvailable = !isToday
             
             if isToday {
                 let remainingSeconds = calculateRemainingTime(from: lastDate)
                 remainingTime = formatRemainingTime(remainingSeconds)
-                print("[DailyReward] Награда недоступна. Осталось: \(remainingTime)")
             } else {
                 remainingTime = "Available"
-                print("[DailyReward] Награда доступна: дата не сегодня")
             }
         } else {
             isRewardAvailable = true
             remainingTime = "Available"
-            print("[DailyReward] Награда доступна: дата не установлена")
         }
     }
     

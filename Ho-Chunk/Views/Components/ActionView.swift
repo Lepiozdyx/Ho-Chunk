@@ -1,9 +1,3 @@
-//
-//  ActionView.swift
-//  Ho-Chunk
-//
-//  Created by Alex on 18.04.2025.
-//
 
 import SwiftUI
 

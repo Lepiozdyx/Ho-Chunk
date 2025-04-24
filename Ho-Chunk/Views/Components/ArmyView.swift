@@ -34,11 +34,9 @@ struct ArmyView: View {
         let endX = army.toRegion.position.x
         let endY = army.toRegion.position.y
         
-        // Линейная интерполяция для текущего положения
         let currentX = startX + (endX - startX) * CGFloat(progress)
         let currentY = startY + (endY - startY) * CGFloat(progress)
         
-        // Применяем масштабирование и смещение
         return scalingService.scaledPosition(CGPoint(x: currentX, y: currentY))
     }
 }

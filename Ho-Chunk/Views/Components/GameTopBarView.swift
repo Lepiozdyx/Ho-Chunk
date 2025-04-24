@@ -23,7 +23,6 @@ struct GameTopBarView: View {
                         .padding(.leading, 8)
                 }
             
-            // Область CPU (красная)
             Rectangle()
                 .fill(
                     LinearGradient(
@@ -54,7 +53,6 @@ struct GameTopBarView: View {
             }
         }
         .onAppear {
-            // Устанавливаем начальное значение при появлении
             withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                 animatedPercentage = playerControlPercentage
             }

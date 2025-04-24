@@ -28,7 +28,6 @@ extension GameState {
     
     static func load() -> GameState {
         guard let data = UserDefaults.standard.data(forKey: gameStateKey) else {
-            print("[GameState] Данные не найдены в UserDefaults, создаю новый экземпляр")
             return GameState()
         }
         
@@ -37,11 +36,8 @@ extension GameState {
             decoder.dateDecodingStrategy = .iso8601
             
             let gameState = try decoder.decode(GameState.self, from: data)
-            print("[GameState] Загружен с датой награды: \(gameState.lastDailyRewardClaimDate?.description ?? "nil")")
             return gameState
         } catch {
-            print("[GameState] ОШИБКА при декодировании: \(error)")
-            // В случае ошибки создаем новый объект GameState
             return GameState()
         }
     }
@@ -54,8 +50,6 @@ extension GameState {
             let encoded = try encoder.encode(self)
             UserDefaults.standard.set(encoded, forKey: GameState.gameStateKey)
             UserDefaults.standard.synchronize() // Принудительная синхронизация
-            
-            print("[GameState] Сохранен с датой награды: \(self.lastDailyRewardClaimDate?.description ?? "nil")")
         } catch {
             print("[GameState] ОШИБКА при кодировании: \(error)")
         }
@@ -64,6 +58,5 @@ extension GameState {
     static func resetProgress() {
         UserDefaults.standard.removeObject(forKey: gameStateKey)
         UserDefaults.standard.synchronize()
-        print("[GameState] Прогресс сброшен")
     }
 }

@@ -11,33 +11,27 @@ class AppViewModel: ObservableObject {
     @Published var gameViewModel: GameViewModel?
     
     init() {
-        // Загружаем сохраненные данные из UserDefaults
         self.gameState = GameState.load()
         self.coins = gameState.coins
         self.gameLevel = gameState.currentLevel
         
-        // Проверяем ежедневный бонус при запуске
         checkDailyBonus()
     }
     
-    // Получить текущую тему
     var currentTheme: BackgroundTheme {
         return BackgroundTheme.getTheme(id: gameState.currentThemeId)
     }
     
-    // Методы навигации
     func navigateTo(_ screen: AppScreen) {
         currentScreen = screen
     }
     
-    // Запуск игры с указанным уровнем
     func startGame(level: Int? = nil) {
-        // Если уровень не указан, используем текущий уровень из gameState
         let levelToStart = level ?? gameState.currentLevel
         gameLevel = levelToStart
         gameState.currentLevel = levelToStart
         gameViewModel = GameViewModel(level: levelToStart)
-        gameViewModel?.appViewModel = self  // Устанавливаем ссылку на AppViewModel
+        gameViewModel?.appViewModel = self
         navigateTo(.game)
         saveGameState()
     }
@@ -57,34 +51,26 @@ class AppViewModel: ObservableObject {
     }
     
     func showVictory() {
-        // Обновляем прогресс
         if gameLevel > gameState.maxCompletedLevel {
             gameState.maxCompletedLevel = gameLevel
         }
         
-        // Обновляем счетчик выигранных игр для достижения "destroyer"
         gameState.gamesWonCount += 1
         
-        // Проверяем достижение "First Victory"
-        // Если это первая победа и достижение еще не получено, отмечаем его
         if gameState.gamesWonCount == 1 &&
            !gameState.completedAchievements.contains("firstVictory") {
             print("Achievement 'First Victory' unlocked!")
         }
         
-        // Начисляем награду
         coins += 50
         gameState.coins = coins
         
-        // Если это первый уровень, отмечаем обучение как пройденное
         if gameLevel == 1 {
             gameState.tutorialCompleted = true
         }
         
-        // Сохраняем прогресс
         saveGameState()
         
-        // Устанавливаем флаг оверлея победы
         gameViewModel?.showVictoryOverlay = true
         gameViewModel?.isPaused = true
     }
@@ -111,16 +97,13 @@ class AppViewModel: ObservableObject {
     func saveGameState() {
         gameState.coins = coins
         gameState.currentLevel = gameLevel
-        print("[AppViewModel] Сохранение состояния. Монеты: \(coins), дата награды: \(gameState.lastDailyRewardClaimDate?.description ?? "nil")")
         gameState.save()
     }
     
-    // Метод для проверки ежедневного входа и получения бонуса
     func checkDailyBonus() {
         let calendar = Calendar.current
         
         if let lastLoginDate = gameState.lastLoginDate {
-            // Проверяем, прошло ли более 24 часов с последнего входа
             if !calendar.isDateInToday(lastLoginDate) {
                 coins += 20
                 gameState.coins = coins
@@ -131,7 +114,6 @@ class AppViewModel: ObservableObject {
         saveGameState()
     }
     
-    // Метод для сброса всего прогресса
     func resetAllProgress() {
         GameState.resetProgress()
         gameState = GameState.load()
