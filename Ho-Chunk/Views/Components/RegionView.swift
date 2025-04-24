@@ -1,25 +1,33 @@
+
 import SwiftUI
 
 struct RegionView: View {
     @ObservedObject var region: Region
+    var scalingService: GameScalingService
     
     var body: some View {
         Image(region.shape)
             .resizable()
             .colorMultiply(region.owner.color)
-            .frame(width: region.width, height: region.height)
+            .frame(
+                width: scalingService.scaledSize(region.width),
+                height: scalingService.scaledSize(region.height)
+            )
             .shadow(color: .black, radius: 2)
             .overlay {
                 VStack {
                     Image(region.owner.logo)
                         .resizable()
-                        .frame(width: 25, height: 25)
+                        .frame(
+                            width: scalingService.scaledSize(25),
+                            height: scalingService.scaledSize(25)
+                        )
                     
                     Text("\(region.troopCount)")
-                        .customFont(18)
+                        .customFont(scalingService.scaledSize(18))
                 }
             }
-            .position(region.position)
+            .position(scalingService.scaledPosition(region.position))
     }
 }
 
@@ -32,5 +40,5 @@ struct RegionView: View {
         owner: .cpu
     )
     
-    return RegionView(region: region)
+    return RegionView(region: region, scalingService: GameScalingService.shared)
 }

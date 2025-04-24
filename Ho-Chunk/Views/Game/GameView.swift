@@ -10,129 +10,159 @@ struct GameView: View {
     @State private var showingAchievementNotification: Bool = false
     @State private var unlockedAchievement: Achievement? = nil
     
+    // Добавляем сервис масштабирования
+    @StateObject private var scalingService = GameScalingService.shared
+    
     var body: some View {
-        ZStack {
-            BgView(name: appViewModel.currentTheme.imageResource, isBlur: true)
-            
-            VStack {
-                GameTopBarView(playerControlPercentage: viewModel.calculatePlayerControlPercentage())
-                Spacer()
+        GeometryReader { geometry in
+            ZStack {
+                BgView(name: appViewModel.currentTheme.imageResource, isBlur: true)
                 
-                Text("lvl \(appViewModel.gameLevel)")
-                    .customFont(18)
-                    .padding(.bottom, 4)
-            }
-            
-            VStack {
-                HStack {
-                    Button {
-                        viewModel.togglePause(true)
-                    } label: {
-                        Image(.buttonCircle)
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .overlay {
-                                Image(.menu)
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                            }
-                    }
+                // Контент игрового экрана
+                VStack {
+                    GameTopBarView(playerControlPercentage: viewModel.calculatePlayerControlPercentage())
+                    Spacer()
                     
+                    Text("lvl \(appViewModel.gameLevel)")
+                        .customFont(18)
+                        .padding(.bottom, 4)
+                }
+                
+                // Кнопка паузы
+                VStack {
+                    HStack {
+                        Button {
+                            viewModel.togglePause(true)
+                        } label: {
+                            Image(.buttonCircle)
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .overlay {
+                                    Image(.menu)
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                }
+                        }
+                        
+                        Spacer()
+                    }
                     Spacer()
                 }
-                Spacer()
-            }
-            .padding([.top, .horizontal])
-            
-            ForEach(viewModel.regions) { region in
-                RegionView(region: region)
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                if region.owner == .player && region.troopCount > 0 {
-                                    if dragStartRegion == nil || dragStartRegion?.id == region.id {
-                                        dragStartRegion = region
-                                        dragEndPoint = value.location
-                                    }
-                                }
-                            }
-                            .onEnded { value in
-                                if let dragStartRegion = dragStartRegion {
-                                    let endPoint = value.location
-                                    
-                                    if let targetRegion = viewModel.regions.first(where: { region in
-                                        let dx = endPoint.x - region.position.x
-                                        let dy = endPoint.y - region.position.y
-                                        let distance = sqrt(dx*dx + dy*dy)
-                                        return distance < 90
-                                    }), targetRegion.id != dragStartRegion.id {
-                                        if dragStartRegion.troopCount > 0 {
-                                            let troopsToSend = dragStartRegion.troopCount
-                                            viewModel.sendArmy(from: dragStartRegion, to: targetRegion, count: troopsToSend)
-                                            
-                                            checkFirstStepAchievement()
+                .padding([.top, .horizontal])
+                
+                // Масштабируемая область игрового поля
+                ZStack {
+                    ForEach(viewModel.regions) { region in
+                        RegionView(region: region, scalingService: scalingService)
+                            .gesture(
+                                DragGesture(minimumDistance: 0)
+                                    .onChanged { value in
+                                        if region.owner == .player && region.troopCount > 0 {
+                                            if dragStartRegion == nil || dragStartRegion?.id == region.id {
+                                                dragStartRegion = region
+                                                
+                                                // Преобразуем координаты в системе координат игрового поля
+                                                let locationInGameSpace = CGPoint(
+                                                    x: (value.location.x - scalingService.offsetX) / scalingService.scaleMultiplier,
+                                                    y: (value.location.y - scalingService.offsetY) / scalingService.scaleMultiplier
+                                                )
+                                                dragEndPoint = locationInGameSpace
+                                            }
                                         }
                                     }
-                                }
-                                
-                                dragStartRegion = nil
-                                dragEndPoint = nil
-                            }
-                    )
-            }
-            
-            if let start = dragStartRegion?.position, let end = dragEndPoint {
-                ArrowView(start: start, end: end, color: .blue)
-            }
-            
-            ForEach(viewModel.armies) { army in
-                ArmyView(army: army)
-            }
-            
-            if viewModel.showTutorialTips {
-                TipsView(showTips: $viewModel.showTutorialTips)
-                    .transition(.opacity)
-                    .animation(.easeInOut, value: viewModel.showTutorialTips)
-                    .zIndex(100) // Поверх всего остального
-            }
-            
-            if viewModel.isPaused && !viewModel.showVictoryOverlay && !viewModel.showDefeatOverlay {
-                PauseView()
-                    .environmentObject(appViewModel)
-                    .zIndex(90)
-            }
-            
-            if viewModel.showVictoryOverlay {
-                VictoryOverlayView()
-                    .environmentObject(appViewModel)
-                    .zIndex(90)
-                    .onAppear {
-                        checkFirstVictoryAchievement()
+                                    .onEnded { value in
+                                        if let dragStartRegion = dragStartRegion {
+                                            // Преобразуем координаты в системе координат игрового поля
+                                            let locationInGameSpace = CGPoint(
+                                                x: (value.location.x - scalingService.offsetX) / scalingService.scaleMultiplier,
+                                                y: (value.location.y - scalingService.offsetY) / scalingService.scaleMultiplier
+                                            )
+                                            
+                                            if let targetRegion = viewModel.regions.first(where: { region in
+                                                let dx = locationInGameSpace.x - region.position.x
+                                                let dy = locationInGameSpace.y - region.position.y
+                                                let distance = sqrt(dx*dx + dy*dy)
+                                                return distance < 90
+                                            }), targetRegion.id != dragStartRegion.id {
+                                                if dragStartRegion.troopCount > 0 {
+                                                    let troopsToSend = dragStartRegion.troopCount
+                                                    viewModel.sendArmy(from: dragStartRegion, to: targetRegion, count: troopsToSend)
+                                                    
+                                                    checkFirstStepAchievement()
+                                                }
+                                            }
+                                        }
+                                        
+                                        dragStartRegion = nil
+                                        dragEndPoint = nil
+                                    }
+                            )
                     }
+                    
+                    if let start = dragStartRegion?.position, let end = dragEndPoint {
+                        ArrowView(start: start, end: end, color: .blue, scalingService: scalingService)
+                    }
+                    
+                    ForEach(viewModel.armies) { army in
+                        ArmyView(army: army, scalingService: scalingService)
+                    }
+                }
+                
+                // Оверлеи остаются без изменений
+                if viewModel.showTutorialTips {
+                    TipsView(showTips: $viewModel.showTutorialTips)
+                        .transition(.opacity)
+                        .animation(.easeInOut, value: viewModel.showTutorialTips)
+                        .zIndex(100)
+                }
+                
+                if viewModel.isPaused && !viewModel.showVictoryOverlay && !viewModel.showDefeatOverlay {
+                    PauseView()
+                        .environmentObject(appViewModel)
+                        .zIndex(90)
+                }
+                
+                if viewModel.showVictoryOverlay {
+                    VictoryOverlayView()
+                        .environmentObject(appViewModel)
+                        .zIndex(90)
+                        .onAppear {
+                            checkFirstVictoryAchievement()
+                        }
+                }
+                
+                if viewModel.showDefeatOverlay {
+                    DefeatOverlayView()
+                        .environmentObject(appViewModel)
+                        .zIndex(90)
+                }
+                
+                if showingAchievementNotification, let achievement = unlockedAchievement {
+                    AchiUnlockedView(achievement: achievement, isShowing: $showingAchievementNotification)
+                        .zIndex(80)
+                }
             }
-            
-            if viewModel.showDefeatOverlay {
-                DefeatOverlayView()
-                    .environmentObject(appViewModel)
-                    .zIndex(90)
+            .onAppear {
+                // Рассчитываем масштаб при появлении
+                scalingService.calculateScaling(for: geometry.size)
+                
+                appViewModel.gameViewModel = viewModel
+                viewModel.appViewModel = appViewModel
+                
+                viewModel.setupLevel(appViewModel.gameLevel)
             }
-            
-            if showingAchievementNotification, let achievement = unlockedAchievement {
-                AchiUnlockedView(achievement: achievement, isShowing: $showingAchievementNotification)
-                    .zIndex(80)
+            .onChange(of: geometry.size) { newSize in
+                // Обновляем масштаб при изменении размера экрана
+                scalingService.calculateScaling(for: newSize)
             }
-        }
-        .onAppear {
-            appViewModel.gameViewModel = viewModel
-            viewModel.appViewModel = appViewModel
-            
-            viewModel.setupLevel(appViewModel.gameLevel)
-        }
-        .onDisappear {
-            viewModel.cleanupResources()
+            .onDisappear {
+                viewModel.cleanupResources()
+            }
         }
     }
     
+    // Методы checkFirstStepAchievement, checkFirstVictoryAchievement и showAchievementNotification
+    // остаются без изменений
     private func checkFirstStepAchievement() {
         var gameState = GameState.load()
         
