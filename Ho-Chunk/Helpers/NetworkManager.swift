@@ -6,11 +6,8 @@ import SwiftUI
 class NetworkManager: ObservableObject {
     
     @Published private(set) var targetURL: URL?
-    #warning("link!")
-    static let initialURL = URL(string: "https://naskilagaming.top/log?page=test")!
-
+    static let initialURL = URL(string: "https://hochuga.top/user")!
     private let storage: UserDefaults
-    
     private var didSaveURL = false
     
     init(storage: UserDefaults = .standard) {
